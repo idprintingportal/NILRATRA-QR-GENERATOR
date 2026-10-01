@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shiv Nirmal ITI - Portal Result & QR Generator</title>
+    <title>Shiv Nirmal ITI - Smart Result & QR Generator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Library -->
@@ -12,6 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- FileSaver Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Tesseract.js for OCR Image Recognition -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
@@ -20,9 +22,9 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    ⚡ Shiv Nirmal ITI - Result Layout & QR Generator
+                    ⚡ Shiv Nirmal ITI - Smart Result & QR Generator
                 </h1>
-                <p class="text-xs text-slate-400">Professional bordered result card with embedded QR and search link</p>
+                <p class="text-xs text-slate-400">Auto-fill via image paste/upload, bordered card preview & QR embedding</p>
             </div>
         </div>
     </header>
@@ -30,70 +32,78 @@
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left Panel: Manual Data Inputs -->
+        <!-- Left Panel: Smart Paste/Upload & Manual Data Inputs -->
         <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-3">
-            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">⚙️ Portal & Student Details</h2>
+            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Smart OCR & Data Inputs</h2>
             
-            <div class="grid grid-cols-2 gap-2">
+            <!-- Paste or Upload Box -->
+            <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-4 text-center cursor-pointer hover:border-sky-400 transition" id="dropZone" contenteditable="true">
+                <p class="text-xs font-bold text-sky-300">📋 Click here & Press Ctrl+V to Paste Result Image</p>
+                <p class="text-[10px] text-slate-400 mt-1">Or upload image file:</p>
+                <input type="file" id="imageUpload" accept="image/*" class="mt-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
+                <p id="ocrStatus" class="text-[10px] text-amber-400 mt-2 font-medium"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-1">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Base URL:</label>
-                    <input type="text" id="baseUrl" value="https://nemrc.co.in/result.php" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="baseUrl" value="https://nemrc.co.in/result.php" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Course:</label>
-                    <input type="text" id="courseVal" value="ITI" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="courseVal" value="ITI" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Student Name:</label>
-                    <input type="text" id="studentName" value="Roshan Bistur sawara" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="studentName" value="Roshan Bistur sawara" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Seat Number:</label>
-                    <input type="text" id="seatNo" value="A1321789" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="seatNo" value="A1321789" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Date Of Birth:</label>
-                    <input type="text" id="dob" value="2002-06-09" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="dob" value="2002-06-09" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Year:</label>
-                    <input type="text" id="yearVal" value="2023 to 2025" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="yearVal" value="2023 to 2025" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Trade:</label>
-                    <input type="text" id="trade" value="Electrician" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="trade" value="Electrician" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Practical Marks:</label>
-                    <input type="text" id="practical" value="331,336" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="practical" value="331,336" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-3 gap-2">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Theory Marks:</label>
-                    <input type="text" id="theory" value="89,92" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="theory" value="89,92" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Total Marks:</label>
-                    <input type="text" id="totalMarks" value="557,563" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="totalMarks" value="557,563" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">OutOff Marks:</label>
-                    <input type="text" id="cutoff" value="700" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
+                    <input type="text" id="cutoff" value="700" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
-            <button onclick="generateCardQR()" class="mt-3 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow transition duration-200 text-xs">
+            <button onclick="generateCardQR()" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg shadow text-xs">
                 🚀 Update Card & Generate QR
             </button>
         </section>
@@ -193,7 +203,6 @@
             linkElement.href = targetUrl;
             linkElement.innerText = targetUrl;
 
-            // QR Payload updated with SHIV NIRMAL ITI heading
             const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nSearch Link:\n${targetUrl}`;
 
             const canvas = document.getElementById('qrCanvas');
@@ -211,6 +220,54 @@
                     saveAs(blob, `Result_Card_${document.getElementById('seatNo').value}.png`);
                 });
             });
+        }
+
+        // Image Paste & OCR Processing Handler
+        const dropZone = document.getElementById('dropZone');
+        const imageUpload = document.getElementById('imageUpload');
+        const ocrStatus = document.getElementById('ocrStatus');
+
+        dropZone.addEventListener('paste', function(e) {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let item of items) {
+                if (item.type.indexOf('image') === 0) {
+                    const blob = item.getAsFile();
+                    processImage(blob);
+                    break;
+                }
+            }
+        });
+
+        imageUpload.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                processImage(e.target.files[0]);
+            }
+        });
+
+        function processImage(file) {
+            ocrStatus.innerText = "🔍 Scanning image and extracting text...";
+            Tesseract.recognize(
+                file,
+                'eng',
+                { logger: m => console.log(m) }
+            ).then(({ data: { text } }) => {
+                ocrStatus.innerText = "✅ Data extracted successfully!";
+                parseExtractedText(text);
+            }).catch(err => {
+                ocrStatus.innerText = "❌ Error reading image. Try another image.";
+                console.error(err);
+            });
+        }
+
+        function parseExtractedText(text) {
+            console.log("OCR Text:", text);
+            // Simple regex match patterns for seat number (e.g. A followed by numbers or alphanumeric code)
+            const seatMatch = text.match(/[A-Z0-9]{7,10}/);
+            if (seatMatch) {
+                document.getElementById('seatNo').value = seatMatch[0];
+            }
+            // You can auto-fill other fields based on patterns or keep manual adjustment
+            generateCardQR();
         }
 
         window.onload = function() {
