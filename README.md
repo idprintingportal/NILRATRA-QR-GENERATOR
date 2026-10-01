@@ -1,12 +1,15 @@
+<!DOCTYPE html>
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OnePlus Maha E-Seva Kendra - Portal QR & Auto-Copy Tool</title>
+    <title>OnePlus Maha E-Seva Kendra - Portal QR & Result Card Generator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <!-- html2canvas for card image export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- JSZip Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- FileSaver Library -->
@@ -19,9 +22,9 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    ⚡ OnePlus Maha E-Seva Kendra - QR Portal Automation
+                    ⚡ OnePlus Maha E-Seva Kendra - Result Layout & QR Generator
                 </h1>
-                <p class="text-xs text-slate-400">Generate QR codes with download, image copy & auto-copy seat number features</p>
+                <p class="text-xs text-slate-400">Generate bordered result cards with auto-search QR codes</p>
             </div>
         </div>
     </header>
@@ -29,58 +32,142 @@
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left Panel: Configuration -->
-        <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-4">
-            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">⚙️ Portal Configuration</h2>
+        <!-- Left Panel: Manual Data Inputs -->
+        <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-3">
+            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">⚙️ Portal & Student Details</h2>
             
-            <div>
-                <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Portal Result Link (Base URL):</label>
-                <input type="text" id="baseUrl" value="https://nemrc.co.in/result.php" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-sky-500">
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Base URL:</label>
+                    <input type="text" id="baseUrl" value="https://nemrc.co.in/result.php" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Course:</label>
+                    <input type="text" id="courseVal" value="ITI" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Course / Dropdown Value:</label>
-                <input type="text" id="courseVal" value="ITI" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-sky-500">
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Student Name:</label>
+                    <input type="text" id="studentName" value="Roshan Bistur sawara" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Seat Number:</label>
+                    <input type="text" id="seatNo" value="A1321789" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Seat Numbers (Comma Separated):</label>
-                <textarea id="seatsInput" rows="4" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-sky-500" placeholder="A1321789, A1321790">A1321789, A1321790</textarea>
-                <p class="text-[10px] text-slate-400 mt-1">Har ek seat number ke liye alag QR code banega.</p>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Date Of Birth:</label>
+                    <input type="text" id="dob" value="2002-06-09" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Year:</label>
+                    <input type="text" id="yearVal" value="2023 to 2025" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
             </div>
 
-            <button onclick="generateQRs()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow transition duration-200 text-sm">
-                🚀 Generate QRs & ZIP Package
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Trade:</label>
+                    <input type="text" id="trade" value="Electrician" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Practical Marks:</label>
+                    <input type="text" id="practical" value="331,336" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Theory Marks:</label>
+                    <input type="text" id="theory" value="89,92" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Total Marks:</label>
+                    <input type="text" id="totalMarks" value="557,563" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">OutOff Marks:</label>
+                    <input type="text" id="cutoff" value="700" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                </div>
+            </div>
+
+            <button onclick="generateCardQR()" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg shadow transition duration-200 text-xs">
+                🚀 Generate Bordered Result Card & QR
             </button>
         </section>
 
-        <!-- Right Panel: Output & Script -->
+        <!-- Right Panel: Preview Layout with Boxes & Lines -->
         <section class="lg:col-span-7 flex flex-col gap-6">
             
-            <!-- Generated Results Box -->
             <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-4">
-                    <h2 class="text-lg font-semibold text-emerald-400">📦 Generated QRs</h2>
-                    <button id="downloadZipBtn" onclick="downloadAllZip()" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded transition">
-                        📥 Download All (ZIP)
-                    </button>
+                    <h2 class="text-lg font-semibold text-emerald-400">📄 Result Card Layout Preview</h2>
+                    <div class="flex gap-2">
+                        <button onclick="downloadCardImage()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded transition">
+                            📥 Download Card
+                        </button>
+                    </div>
                 </div>
                 
-                <div id="qrContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2">
-                    <p class="text-slate-400 text-sm italic col-span-2 text-center py-8">Configure details on left and click Generate.</p>
+                <!-- Bordered Box Card Container matching portal style -->
+                <div id="captureCard" class="bg-white text-slate-800 p-4 rounded-lg border-2 border-slate-400 shadow-md flex flex-col gap-4">
+                    <div class="flex justify-between items-center border-b-2 border-slate-300 pb-2">
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-900 uppercase">OnePlus Maha E-Seva Kendra</h3>
+                            <p class="text-[10px] text-slate-500">Official Portal Result Verification Card</p>
+                        </div>
+                        <div class="bg-white p-1 border border-slate-300 rounded">
+                            <canvas id="qrCanvas" class="w-24 h-24"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Table with explicit borders and boxes -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse border border-slate-400 text-[11px] text-center">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700">
+                                    <th class="border border-slate-400 p-1.5">Student Name</th>
+                                    <th class="border border-slate-400 p-1.5">Seat No</th>
+                                    <th class="border border-slate-400 p-1.5">Date Of Birth</th>
+                                    <th class="border border-slate-400 p-1.5">Year</th>
+                                    <th class="border border-slate-400 p-1.5">Trade</th>
+                                    <th class="border border-slate-400 p-1.5">Practical</th>
+                                    <th class="border border-slate-400 p-1.5">Theory</th>
+                                    <th class="border border-slate-400 p-1.5">Total</th>
+                                    <th class="border border-slate-400 p-1.5">OutOff</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="lblStudentName" class="border border-slate-400 p-1.5 font-medium">Roshan Bistur sawara</td>
+                                    <td id="lblSeatNo" class="border border-slate-400 p-1.5 font-bold text-blue-600">A1321789</td>
+                                    <td id="lblDob" class="border border-slate-400 p-1.5">2002-06-09</td>
+                                    <td id="lblYear" class="border border-slate-400 p-1.5">2023 to 2025</td>
+                                    <td id="lblTrade" class="border border-slate-400 p-1.5">Electrician</td>
+                                    <td id="lblPractical" class="border border-slate-400 p-1.5">331,336</td>
+                                    <td id="lblTheory" class="border border-slate-400 p-1.5">89,92</td>
+                                    <td id="lblTotal" class="border border-slate-400 p-1.5 font-bold">557,563</td>
+                                    <td id="lblCutoff" class="border border-slate-400 p-1.5">700</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-[9px] text-slate-400 text-right">Scan QR code to auto-copy seat number & open search portal.</div>
                 </div>
             </div>
 
             <!-- Tampermonkey Script Helper Box -->
             <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
                 <h2 class="text-lg font-semibold text-amber-400 border-b border-slate-700 pb-2 mb-2">📜 Tampermonkey Auto-Copy Script</h2>
-                <p class="text-xs text-slate-300 mb-2">Is script ko apne Tampermonkey extension mein dalein taaki link khulte hi seat number automatic copy ho jaye:</p>
-                <textarea readonly rows="6" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 font-mono text-[11px] text-sky-300 focus:outline-none">// ==UserScript==
+                <textarea readonly rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 font-mono text-[11px] text-sky-300 focus:outline-none">// ==UserScript==
 // @name         Auto Copy Seat Number & Course
 // @namespace    http://tampermonkey.net/
 // @version      1.1
 // @match        https://nemrc.co.in/*
-// @grant        GM_setClipboard
 // @grant        navigator.clipboard
 // ==/UserScript==
 
@@ -90,46 +177,18 @@
         const urlParams = new URLSearchParams(window.location.search);
         const seatNo = urlParams.get('seat');
         const course = urlParams.get('course');
-        
         if (seatNo) {
             if (course) {
                 const selectBox = document.querySelector('select');
-                if (selectBox) {
-                    selectBox.value = course;
-                    selectBox.dispatchEvent(new Event('change', { bubbles: true }));
-                }
+                if (selectBox) { selectBox.value = course; selectBox.dispatchEvent(new Event('change', { bubbles: true })); }
             }
-
             setTimeout(() => {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(seatNo);
-                } else {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = seatNo;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(textArea);
-                }
-
+                if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(seatNo); }
                 const notification = document.createElement('div');
                 notification.innerHTML = `📋 Seat Number <b>${seatNo}</b> Copied! Just Paste (Ctrl+V) in search box.`;
-                notification.style.position = 'fixed';
-                notification.style.top = '20px';
-                notification.style.right = '20px';
-                notification.style.background = '#10b981';
-                notification.style.color = '#fff';
-                notification.style.padding = '12px 20px';
-                notification.style.borderRadius = '8px';
-                notification.style.zIndex = '99999';
-                notification.style.fontFamily = 'sans-serif';
-                notification.style.fontSize = '14px';
+                notification.style.cssText = 'position:fixed;top:20px;right:20px;background:#10b981;color:#fff;padding:12px 20px;border-radius:8px;z-index:99999;font-family:sans-serif;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
                 document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.remove();
-                }, 4000);
-
+                setTimeout(() => notification.remove(), 4000);
             }, 600);
         }
     });
@@ -140,100 +199,43 @@
     </main>
 
     <script>
-        let generatedData = [];
-
-        function generateQRs() {
+        function generateCardQR() {
             const baseUrl = document.getElementById('baseUrl').value.trim();
             const courseVal = document.getElementById('courseVal').value.trim();
-            const seatsRaw = document.getElementById('seatsInput').value;
-            const seats = seatsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            const seatNo = document.getElementById('seatNo').value.trim();
             
-            const container = document.getElementById('qrContainer');
-            container.innerHTML = '';
-            generatedData = [];
+            // Update table preview texts
+            document.getElementById('lblStudentName').innerText = document.getElementById('studentName').value;
+            document.getElementById('lblSeatNo').innerText = seatNo;
+            document.getElementById('lblDob').innerText = document.getElementById('dob').value;
+            document.getElementById('lblYear').innerText = document.getElementById('yearVal').value;
+            document.getElementById('lblTrade').innerText = document.getElementById('trade').value;
+            document.getElementById('lblPractical').innerText = document.getElementById('practical').value;
+            document.getElementById('lblTheory').innerText = document.getElementById('theory').value;
+            document.getElementById('lblTotal').innerText = document.getElementById('totalMarks').value;
+            document.getElementById('lblCutoff').innerText = document.getElementById('cutoff').value;
 
-            if (!baseUrl || seats.length === 0) {
-                container.innerHTML = '<p class="text-red-400 text-sm col-span-2 text-center">Please enter a valid base URL and seat numbers.</p>';
-                document.getElementById('downloadZipBtn').classList.add('hidden');
-                return;
-            }
+            const targetUrl = `${baseUrl}?course=${encodeURIComponent(courseVal)}&seat=${encodeURIComponent(seatNo)}`;
 
-            seats.forEach((seat, index) => {
-                const targetUrl = `${baseUrl}?course=${encodeURIComponent(courseVal)}&seat=${encodeURIComponent(seat)}`;
-                
-                const card = document.createElement('div');
-                card.className = 'bg-slate-900 border border-slate-700 p-3 rounded-lg flex flex-col gap-2';
-                
-                const canvasId = `qr_canvas_${index}_${Date.now()}`;
-                
-                card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="bg-white p-1.5 rounded shrink-0">
-                            <canvas id="${canvasId}" class="w-20 h-20"></canvas>
-                        </div>
-                        <div class="overflow-hidden flex-1">
-                            <p class="text-xs font-bold text-sky-300">Seat: ${seat}</p>
-                            <p class="text-[10px] text-slate-400 truncate mt-0.5">${targetUrl}</p>
-                            <a href="${targetUrl}" target="_blank" class="inline-block mt-1 text-[10px] bg-blue-600 hover:bg-blue-500 text-white px-2 py-0.5 rounded">Test Link ↗</a>
-                        </div>
-                    </div>
-                    <div class="flex gap-2 pt-1 border-t border-slate-800">
-                        <button onclick="downloadSingleQR('${canvasId}', '${seat}')" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] py-1 rounded font-medium">📥 Download QR</button>
-                        <button onclick="copySingleQR('${canvasId}')" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white text-[10px] py-1 rounded font-medium">📋 Copy QR</button>
-                    </div>
-                `;
-                container.appendChild(card);
-
-                setTimeout(() => {
-                    const canvasElement = document.getElementById(canvasId);
-                    if (canvasElement) {
-                        QRCode.toCanvas(canvasElement, targetUrl, { width: 120, margin: 1 }, function (error) {
-                            if (error) console.error("QR Error:", error);
-                        });
-                    }
-                }, 50);
-
-                generatedData.push({ seat, targetUrl, canvasId });
-            });
-
-            if (generatedData.length > 0) {
-                document.getElementById('downloadZipBtn').classList.remove('hidden');
-            }
-        }
-
-        function downloadSingleQR(canvasId, seat) {
-            const canvas = document.getElementById(canvasId);
-            canvas.toBlob(function(blob) {
-                saveAs(blob, `QR_${seat}.png`);
+            const canvas = document.getElementById('qrCanvas');
+            QRCode.toCanvas(canvas, targetUrl, { width: 120, margin: 1 }, function (error) {
+                if (error) console.error("QR Error:", error);
             });
         }
 
-        async function copySingleQR(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            try {
-                canvas.toBlob(async function(blob) {
-                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-                    alert("QR Code image copied to clipboard!");
+        function downloadCardImage() {
+            const cardElement = document.getElementById('captureCard');
+            html2canvas(cardElement, { scale: 2 }).then(canvas => {
+                canvas.toBlob(function(blob) {
+                    saveAs(blob, `Result_Card_${document.getElementById('seatNo').value}.png`);
                 });
-            } catch (err) {
-                alert("Failed to copy QR image. Your browser might not support direct image copying.");
-            }
+            });
         }
 
-        async function downloadAllZip() {
-            const zip = new JSZip();
-            const folder = zip.folder("Generated_QR_Codes");
-
-            for (let item of generatedData) {
-                const canvas = document.getElementById(item.canvasId);
-                const dataUrl = canvas.toDataURL("image/png");
-                const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
-                folder.file(`QR_${item.seat}.png`, base64Data, { base64: true });
-            }
-
-            const content = await zip.generateAsync({ type: "blob" });
-            saveAs(content, "Portal_QRs.zip");
-        }
+        // Auto generate on load
+        window.onload = function() {
+            generateCardQR();
+        };
     </script>
 </body>
 </html>
