@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OnePlus Maha E-Seva Kendra - Portal QR & Result Card Generator</title>
+    <title>OnePlus Maha E-Seva Kendra - Portal Result & QR Generator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <!-- html2canvas for card image export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- JSZip Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- FileSaver Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
@@ -24,7 +22,7 @@
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
                     ⚡ OnePlus Maha E-Seva Kendra - Result Layout & QR Generator
                 </h1>
-                <p class="text-xs text-slate-400">Generate bordered result cards with auto-search QR codes</p>
+                <p class="text-xs text-slate-400">Professional bordered result card with embedded QR and search link</p>
             </div>
         </div>
     </header>
@@ -39,64 +37,64 @@
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Base URL:</label>
-                    <input type="text" id="baseUrl" value="https://nemrc.co.in/result.php" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="baseUrl" value="https://nemrc.co.in/result.php" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Course:</label>
-                    <input type="text" id="courseVal" value="ITI" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="courseVal" value="ITI" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Student Name:</label>
-                    <input type="text" id="studentName" value="Roshan Bistur sawara" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="studentName" value="Roshan Bistur sawara" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Seat Number:</label>
-                    <input type="text" id="seatNo" value="A1321789" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="seatNo" value="A1321789" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Date Of Birth:</label>
-                    <input type="text" id="dob" value="2002-06-09" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="dob" value="2002-06-09" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Year:</label>
-                    <input type="text" id="yearVal" value="2023 to 2025" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="yearVal" value="2023 to 2025" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Trade:</label>
-                    <input type="text" id="trade" value="Electrician" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="trade" value="Electrician" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Practical Marks:</label>
-                    <input type="text" id="practical" value="331,336" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="practical" value="331,336" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-3 gap-2">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Theory Marks:</label>
-                    <input type="text" id="theory" value="89,92" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="theory" value="89,92" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Total Marks:</label>
-                    <input type="text" id="totalMarks" value="557,563" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="totalMarks" value="557,563" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">OutOff Marks:</label>
-                    <input type="text" id="cutoff" value="700" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                    <input type="text" id="cutoff" value="700" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:border-sky-500 outline-none">
                 </div>
             </div>
 
-            <button onclick="generateCardQR()" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg shadow transition duration-200 text-xs">
-                🚀 Generate Bordered Result Card & QR
+            <button onclick="generateCardQR()" class="mt-3 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow transition duration-200 text-xs">
+                🚀 Update Card & Generate QR
             </button>
         </section>
 
@@ -106,11 +104,9 @@
             <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-4">
                     <h2 class="text-lg font-semibold text-emerald-400">📄 Result Card Layout Preview</h2>
-                    <div class="flex gap-2">
-                        <button onclick="downloadCardImage()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded transition">
-                            📥 Download Card
-                        </button>
-                    </div>
+                    <button onclick="downloadCardImage()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded transition">
+                        📥 Download Card Image
+                    </button>
                 </div>
                 
                 <!-- Bordered Box Card Container matching portal style -->
@@ -156,43 +152,13 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="text-[9px] text-slate-400 text-right">Scan QR code to auto-copy seat number & open search portal.</div>
+
+                    <!-- Original Portal Link Box at the bottom -->
+                    <div class="border-t-2 border-slate-300 pt-2 flex justify-between items-center text-[10px]">
+                        <span class="text-slate-600 font-semibold">🔗 Official Search Portal Link:</span>
+                        <a id="lblPortalLink" href="https://nemrc.co.in/result.php" target="_blank" class="text-blue-600 underline font-bold truncate max-w-[280px]">https://nemrc.co.in/result.php?course=ITI&seat=A1321789</a>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Tampermonkey Script Helper Box -->
-            <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
-                <h2 class="text-lg font-semibold text-amber-400 border-b border-slate-700 pb-2 mb-2">📜 Tampermonkey Auto-Copy Script</h2>
-                <textarea readonly rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 font-mono text-[11px] text-sky-300 focus:outline-none">// ==UserScript==
-// @name         Auto Copy Seat Number & Course
-// @namespace    http://tampermonkey.net/
-// @version      1.1
-// @match        https://nemrc.co.in/*
-// @grant        navigator.clipboard
-// ==/UserScript==
-
-(function() {
-    'use strict';
-    window.addEventListener('load', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const seatNo = urlParams.get('seat');
-        const course = urlParams.get('course');
-        if (seatNo) {
-            if (course) {
-                const selectBox = document.querySelector('select');
-                if (selectBox) { selectBox.value = course; selectBox.dispatchEvent(new Event('change', { bubbles: true })); }
-            }
-            setTimeout(() => {
-                if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(seatNo); }
-                const notification = document.createElement('div');
-                notification.innerHTML = `📋 Seat Number <b>${seatNo}</b> Copied! Just Paste (Ctrl+V) in search box.`;
-                notification.style.cssText = 'position:fixed;top:20px;right:20px;background:#10b981;color:#fff;padding:12px 20px;border-radius:8px;z-index:99999;font-family:sans-serif;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
-                document.body.appendChild(notification);
-                setTimeout(() => notification.remove(), 4000);
-            }, 600);
-        }
-    });
-})();</textarea>
             </div>
 
         </section>
@@ -203,24 +169,41 @@
             const baseUrl = document.getElementById('baseUrl').value.trim();
             const courseVal = document.getElementById('courseVal').value.trim();
             const seatNo = document.getElementById('seatNo').value.trim();
-            
-            // Update table preview texts
-            document.getElementById('lblStudentName').innerText = document.getElementById('studentName').value;
+            const studentName = document.getElementById('studentName').value.trim();
+            const dob = document.getElementById('dob').value.trim();
+            const yearVal = document.getElementById('yearVal').value.trim();
+            const trade = document.getElementById('trade').value.trim();
+            const practical = document.getElementById('practical').value.trim();
+            const theory = document.getElementById('theory').value.trim();
+            const totalMarks = document.getElementById('totalMarks').value.trim();
+            const cutoff = document.getElementById('cutoff').value.trim();
+
+            // Update UI preview table labels
+            document.getElementById('lblStudentName').innerText = studentName;
             document.getElementById('lblSeatNo').innerText = seatNo;
-            document.getElementById('lblDob').innerText = document.getElementById('dob').value;
-            document.getElementById('lblYear').innerText = document.getElementById('yearVal').value;
-            document.getElementById('lblTrade').innerText = document.getElementById('trade').value;
-            document.getElementById('lblPractical').innerText = document.getElementById('practical').value;
-            document.getElementById('lblTheory').innerText = document.getElementById('theory').value;
-            document.getElementById('lblTotal').innerText = document.getElementById('totalMarks').value;
-            document.getElementById('lblCutoff').innerText = document.getElementById('cutoff').value;
+            document.getElementById('lblDob').innerText = dob;
+            document.getElementById('lblYear').innerText = yearVal;
+            document.getElementById('lblTrade').innerText = trade;
+            document.getElementById('lblPractical').innerText = practical;
+            document.getElementById('lblTheory').innerText = theory;
+            document.getElementById('lblTotal').innerText = totalMarks;
+            document.getElementById('lblCutoff').innerText = cutoff;
 
             const targetUrl = `${baseUrl}?course=${encodeURIComponent(courseVal)}&seat=${encodeURIComponent(seatNo)}`;
+            document.getElementById('lblPortalLink.href') ? document.getElementById('lblPortalLink.href').href = targetUrl : null;
+            const linkElement = document.getElementById('lblPortalLink');
+            linkElement.href = targetUrl;
+            linkElement.innerText = targetUrl;
+
+            // QR Payload combining formatted information layout and original portal search link
+            const qrPayload = `=========================\nONEPLUS MAHA E-SEVA KENDRA\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nSearch Link:\n${targetUrl}`;
 
             const canvas = document.getElementById('qrCanvas');
-            QRCode.toCanvas(canvas, targetUrl, { width: 120, margin: 1 }, function (error) {
-                if (error) console.error("QR Error:", error);
-            });
+            setTimeout(() => {
+                QRCode.toCanvas(canvas, qrPayload, { width: 140, margin: 1 }, function (error) {
+                    if (error) console.error("QR Generation Error:", error);
+                });
+            }, 50);
         }
 
         function downloadCardImage() {
@@ -232,7 +215,7 @@
             });
         }
 
-        // Auto generate on load
+        // Run on load
         window.onload = function() {
             generateCardQR();
         };
