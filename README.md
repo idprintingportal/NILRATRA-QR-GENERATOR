@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shiv Nirmal ITI - Smart Result & QR Generator</title>
+    <title>Shiv Nirmal ITI - Smart Auto OCR Result & QR Generator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Library -->
@@ -22,9 +22,9 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    ⚡ Shiv Nirmal ITI - Smart Result & QR Generator
+                    ⚡ Shiv Nirmal ITI - Smart Auto OCR Result & QR Generator
                 </h1>
-                <p class="text-xs text-slate-400">Auto-fill via image paste/upload, bordered card preview & QR embedding</p>
+                <p class="text-xs text-slate-400">Paste/Upload image to auto-fill details, generate card & embedded QR</p>
             </div>
         </div>
     </header>
@@ -34,14 +34,14 @@
         
         <!-- Left Panel: Smart Paste/Upload & Manual Data Inputs -->
         <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-3">
-            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Smart OCR & Data Inputs</h2>
+            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Smart OCR Auto-Fill Box</h2>
             
             <!-- Paste or Upload Box -->
-            <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-4 text-center cursor-pointer hover:border-sky-400 transition" id="dropZone" contenteditable="true">
+            <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-4 text-center cursor-pointer hover:border-sky-400 transition focus:outline-none" id="dropZone" tabindex="0">
                 <p class="text-xs font-bold text-sky-300">📋 Click here & Press Ctrl+V to Paste Result Image</p>
-                <p class="text-[10px] text-slate-400 mt-1">Or upload image file:</p>
+                <p class="text-[10px] text-slate-400 mt-1">Or choose an image file:</p>
                 <input type="file" id="imageUpload" accept="image/*" class="mt-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
-                <p id="ocrStatus" class="text-[10px] text-amber-400 mt-2 font-medium"></p>
+                <p id="ocrStatus" class="text-[11px] text-amber-400 mt-2 font-semibold"></p>
             </div>
 
             <div class="grid grid-cols-2 gap-2 mt-1">
@@ -245,28 +245,39 @@
         });
 
         function processImage(file) {
-            ocrStatus.innerText = "🔍 Scanning image and extracting text...";
+            ocrStatus.innerText = "🔍 Reading image data via OCR...";
             Tesseract.recognize(
                 file,
                 'eng',
                 { logger: m => console.log(m) }
             ).then(({ data: { text } }) => {
-                ocrStatus.innerText = "✅ Data extracted successfully!";
+                ocrStatus.innerText = "✅ Data extracted & auto-filled successfully!";
                 parseExtractedText(text);
             }).catch(err => {
-                ocrStatus.innerText = "❌ Error reading image. Try another image.";
+                ocrStatus.innerText = "❌ Could not read image. Please try clear image.";
                 console.error(err);
             });
         }
 
         function parseExtractedText(text) {
-            console.log("OCR Text:", text);
-            // Simple regex match patterns for seat number (e.g. A followed by numbers or alphanumeric code)
-            const seatMatch = text.match(/[A-Z0-9]{7,10}/);
-            if (seatMatch) {
-                document.getElementById('seatNo').value = seatMatch[0];
+            console.log("Extracted OCR Text:\n", text);
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+            // Smart extraction logic for seat numbers, dates, marks etc.
+            for (let line of lines) {
+                // Match seat number pattern (e.g. A followed by numbers)
+                if (/[A-Z]\d{6,10}/.test(line)) {
+                    const match = line.match(/[A-Z]\d{6,10}/);
+                    if (match) document.getElementById('seatNo').value = match[0];
+                }
+                // Match Date format YYYY-MM-DD or DD/MM/YYYY
+                if (/\d{4}[-/]\d{2}[-/]\d{2}/.test(line)) {
+                    const match = line.match(/\d{4}[-/]\d{2}[-/]\d{2}/);
+                    if (match) document.getElementById('dob').value = match[0];
+                }
             }
-            // You can auto-fill other fields based on patterns or keep manual adjustment
+
+            // Automatically trigger update and QR generation with extracted info
             generateCardQR();
         }
 
