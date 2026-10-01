@@ -24,7 +24,7 @@
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
                     ⚡ Shiv Nirmal ITI - Smart Auto OCR Result & QR Generator
                 </h1>
-                <p class="text-xs text-slate-400">Paste/Upload image to auto-fill details, generate card & embedded QR</p>
+                <p class="text-xs text-slate-400">Paste/Upload image to auto-fill empty fields, generate card & embedded QR</p>
             </div>
         </div>
     </header>
@@ -58,44 +58,44 @@
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Student Name:</label>
-                    <input type="text" id="studentName" value="Roshan Bistur sawara" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="studentName" placeholder="Auto-filled from image" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Seat Number:</label>
-                    <input type="text" id="seatNo" value="A1321789" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="seatNo" placeholder="Auto-filled from image" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Date Of Birth:</label>
-                    <input type="text" id="dob" value="2002-06-09" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="dob" placeholder="YYYY-MM-DD" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Year:</label>
-                    <input type="text" id="yearVal" value="2023 to 2025" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="yearVal" placeholder="2023 to 2025" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Trade:</label>
-                    <input type="text" id="trade" value="Electrician" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="trade" placeholder="Electrician" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Practical Marks:</label>
-                    <input type="text" id="practical" value="331,336" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="practical" placeholder="Practical Marks" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
             <div class="grid grid-cols-3 gap-2">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Theory Marks:</label>
-                    <input type="text" id="theory" value="89,92" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="theory" placeholder="Theory" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Total Marks:</label>
-                    <input type="text" id="totalMarks" value="557,563" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="totalMarks" placeholder="Total" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">OutOff Marks:</label>
@@ -104,7 +104,7 @@
             </div>
 
             <button onclick="generateCardQR()" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg shadow text-xs">
-                🚀 Update Card & Generate QR
+                🚀 Generate Card & QR
             </button>
         </section>
 
@@ -149,14 +149,14 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td id="lblStudentName" class="border border-slate-400 p-1.5 font-medium">Roshan Bistur sawara</td>
-                                    <td id="lblSeatNo" class="border border-slate-400 p-1.5 font-bold text-blue-600">A1321789</td>
-                                    <td id="lblDob" class="border border-slate-400 p-1.5">2002-06-09</td>
-                                    <td id="lblYear" class="border border-slate-400 p-1.5">2023 to 2025</td>
-                                    <td id="lblTrade" class="border border-slate-400 p-1.5">Electrician</td>
-                                    <td id="lblPractical" class="border border-slate-400 p-1.5">331,336</td>
-                                    <td id="lblTheory" class="border border-slate-400 p-1.5">89,92</td>
-                                    <td id="lblTotal" class="border border-slate-400 p-1.5 font-bold">557,563</td>
+                                    <td id="lblStudentName" class="border border-slate-400 p-1.5 font-medium">-</td>
+                                    <td id="lblSeatNo" class="border border-slate-400 p-1.5 font-bold text-blue-600">-</td>
+                                    <td id="lblDob" class="border border-slate-400 p-1.5">-</td>
+                                    <td id="lblYear" class="border border-slate-400 p-1.5">-</td>
+                                    <td id="lblTrade" class="border border-slate-400 p-1.5">-</td>
+                                    <td id="lblPractical" class="border border-slate-400 p-1.5">-</td>
+                                    <td id="lblTheory" class="border border-slate-400 p-1.5">-</td>
+                                    <td id="lblTotal" class="border border-slate-400 p-1.5 font-bold">-</td>
                                     <td id="lblCutoff" class="border border-slate-400 p-1.5">700</td>
                                 </tr>
                             </tbody>
@@ -166,7 +166,7 @@
                     <!-- Original Portal Link Box at the bottom -->
                     <div class="border-t-2 border-slate-300 pt-2 flex justify-between items-center text-[10px]">
                         <span class="text-slate-600 font-semibold">🔗 Official Search Portal Link:</span>
-                        <a id="lblPortalLink" href="https://nemrc.co.in/result.php" target="_blank" class="text-blue-600 underline font-bold truncate max-w-[280px]">https://nemrc.co.in/result.php?course=ITI&seat=A1321789</a>
+                        <a id="lblPortalLink" href="#" target="_blank" class="text-blue-600 underline font-bold truncate max-w-[280px]">#</a>
                     </div>
                 </div>
             </div>
@@ -178,15 +178,15 @@
         function generateCardQR() {
             const baseUrl = document.getElementById('baseUrl').value.trim();
             const courseVal = document.getElementById('courseVal').value.trim();
-            const seatNo = document.getElementById('seatNo').value.trim();
-            const studentName = document.getElementById('studentName').value.trim();
-            const dob = document.getElementById('dob').value.trim();
-            const yearVal = document.getElementById('yearVal').value.trim();
-            const trade = document.getElementById('trade').value.trim();
-            const practical = document.getElementById('practical').value.trim();
-            const theory = document.getElementById('theory').value.trim();
-            const totalMarks = document.getElementById('totalMarks').value.trim();
-            const cutoff = document.getElementById('cutoff').value.trim();
+            const seatNo = document.getElementById('seatNo').value.trim() || "N/A";
+            const studentName = document.getElementById('studentName').value.trim() || "N/A";
+            const dob = document.getElementById('dob').value.trim() || "N/A";
+            const yearVal = document.getElementById('yearVal').value.trim() || "N/A";
+            const trade = document.getElementById('trade').value.trim() || "N/A";
+            const practical = document.getElementById('practical').value.trim() || "N/A";
+            const theory = document.getElementById('theory').value.trim() || "N/A";
+            const totalMarks = document.getElementById('totalMarks').value.trim() || "N/A";
+            const cutoff = document.getElementById('cutoff').value.trim() || "700";
 
             document.getElementById('lblStudentName').innerText = studentName;
             document.getElementById('lblSeatNo').innerText = seatNo;
@@ -217,7 +217,7 @@
             const cardElement = document.getElementById('captureCard');
             html2canvas(cardElement, { scale: 2 }).then(canvas => {
                 canvas.toBlob(function(blob) {
-                    saveAs(blob, `Result_Card_${document.getElementById('seatNo').value}.png`);
+                    saveAs(blob, `Result_Card_${document.getElementById('seatNo').value || 'Data'}.png`);
                 });
             });
         }
@@ -263,27 +263,47 @@
             console.log("Extracted OCR Text:\n", text);
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-            // Smart extraction logic for seat numbers, dates, marks etc.
+            // Clear inputs first
+            document.getElementById('seatNo').value = "";
+            document.getElementById('studentName').value = "";
+            document.getElementById('dob').value = "";
+            document.getElementById('trade').value = "";
+            document.getElementById('practical').value = "";
+            document.getElementById('theory').value = "";
+            document.getElementById('totalMarks').value = "";
+
+            let foundSeat = "";
+            let foundDates = [];
+            let foundNumbers = [];
+
             for (let line of lines) {
                 // Match seat number pattern (e.g. A followed by numbers)
-                if (/[A-Z]\d{6,10}/.test(line)) {
+                if (!foundSeat && /[A-Z]\d{6,10}/.test(line)) {
                     const match = line.match(/[A-Z]\d{6,10}/);
-                    if (match) document.getElementById('seatNo').value = match[0];
+                    if (match) foundSeat = match[0];
                 }
-                // Match Date format YYYY-MM-DD or DD/MM/YYYY
+                // Match Date format
                 if (/\d{4}[-/]\d{2}[-/]\d{2}/.test(line)) {
                     const match = line.match(/\d{4}[-/]\d{2}[-/]\d{2}/);
-                    if (match) document.getElementById('dob').value = match[0];
+                    if (match) foundDates.push(match[0]);
                 }
             }
 
-            // Automatically trigger update and QR generation with extracted info
+            if (foundSeat) document.getElementById('seatNo').value = foundSeat;
+            if (foundDates.length > 0) document.getElementById('dob').value = foundDates[0];
+
+            // Assign lines heuristically or leave open for manual fine-tuning if needed, 
+            // but fill whatever valid text blocks were found.
+            if (lines.length > 0) {
+                // If first line isn't a code, treat as student name
+                if (!/[A-Z]\d{6,10}/.test(lines[0])) {
+                    document.getElementById('studentName').value = lines[0];
+                }
+            }
+
+            // Automatically generate card and QR with filled data
             generateCardQR();
         }
-
-        window.onload = function() {
-            generateCardQR();
-        };
     </script>
 </body>
 </html>
