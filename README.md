@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> SHIVNIRMAL ITI - Portal Result & QR Generator</title>
+    <title>Shiv Nirmal ITI - Portal Result & QR Generator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Library -->
@@ -20,7 +20,7 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    ⚡ SHIVNIRMAL ITI - Result Layout & QR Generator
+                    ⚡ Shiv Nirmal ITI - Result Layout & QR Generator
                 </h1>
                 <p class="text-xs text-slate-400">Professional bordered result card with embedded QR and search link</p>
             </div>
@@ -113,7 +113,7 @@
                 <div id="captureCard" class="bg-white text-slate-800 p-4 rounded-lg border-2 border-slate-400 shadow-md flex flex-col gap-4">
                     <div class="flex justify-between items-center border-b-2 border-slate-300 pb-2">
                         <div>
-                            <h3 class="font-bold text-sm text-slate-900 uppercase">SHIVNIRMAL ITI</h3>
+                            <h3 class="font-bold text-sm text-slate-900 uppercase">Shiv Nirmal ITI</h3>
                             <p class="text-[10px] text-slate-500">Official Portal Result Verification Card</p>
                         </div>
                         <div class="bg-white p-1 border border-slate-300 rounded">
@@ -178,7 +178,6 @@
             const totalMarks = document.getElementById('totalMarks').value.trim();
             const cutoff = document.getElementById('cutoff').value.trim();
 
-            // Update UI preview table labels
             document.getElementById('lblStudentName').innerText = studentName;
             document.getElementById('lblSeatNo').innerText = seatNo;
             document.getElementById('lblDob').innerText = dob;
@@ -190,13 +189,12 @@
             document.getElementById('lblCutoff').innerText = cutoff;
 
             const targetUrl = `${baseUrl}?course=${encodeURIComponent(courseVal)}&seat=${encodeURIComponent(seatNo)}`;
-            document.getElementById('lblPortalLink.href') ? document.getElementById('lblPortalLink.href').href = targetUrl : null;
             const linkElement = document.getElementById('lblPortalLink');
             linkElement.href = targetUrl;
             linkElement.innerText = targetUrl;
 
-            // QR Payload combining formatted information layout and original portal search link
-            const qrPayload = `=========================\nONEPLUS MAHA E-SEVA KENDRA\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nSearch Link:\n${targetUrl}`;
+            // QR Payload updated with SHIV NIRMAL ITI heading
+            const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nSearch Link:\n${targetUrl}`;
 
             const canvas = document.getElementById('qrCanvas');
             setTimeout(() => {
@@ -215,7 +213,6 @@
             });
         }
 
-        // Run on load
         window.onload = function() {
             generateCardQR();
         };
