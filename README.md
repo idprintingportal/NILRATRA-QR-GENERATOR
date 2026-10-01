@@ -20,7 +20,7 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    ⚡ OnePlus Maha E-Seva Kendra - Result Layout & QR Generator
+                    ⚡ SHIVNIRMAL ITI - Result Layout & QR Generator
                 </h1>
                 <p class="text-xs text-slate-400">Professional bordered result card with embedded QR and search link</p>
             </div>
@@ -113,7 +113,7 @@
                 <div id="captureCard" class="bg-white text-slate-800 p-4 rounded-lg border-2 border-slate-400 shadow-md flex flex-col gap-4">
                     <div class="flex justify-between items-center border-b-2 border-slate-300 pb-2">
                         <div>
-                            <h3 class="font-bold text-sm text-slate-900 uppercase">OnePlus Maha E-Seva Kendra</h3>
+                            <h3 class="font-bold text-sm text-slate-900 uppercase">SHIVNIRMAL ITI</h3>
                             <p class="text-[10px] text-slate-500">Official Portal Result Verification Card</p>
                         </div>
                         <div class="bg-white p-1 border border-slate-300 rounded">
