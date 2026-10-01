@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
@@ -142,13 +141,13 @@
                 return;
             }
 
-            seats.forEach(seat => {
+            seats.forEach((seat, index) => {
                 const targetUrl = `${baseUrl}?course=${encodeURIComponent(courseVal)}&seat=${encodeURIComponent(seat)}`;
                 
                 const card = document.createElement('div');
                 card.className = 'bg-slate-900 border border-slate-700 p-3 rounded-lg flex items-center gap-3';
                 
-                const canvasId = `qr_${seat}_${Math.random().toString(36.substring(2, 7))}`;
+                const canvasId = `qr_canvas_${index}_${Date.now()}`;
                 
                 card.innerHTML = `
                     <div class="bg-white p-1.5 rounded shrink-0">
@@ -162,10 +161,15 @@
                 `;
                 container.appendChild(card);
 
-                // Render QR
-                QRCode.toCanvas(document.getElementById(canvasId), targetUrl, { width: 100, margin: 1 }, function (error) {
-                    if (error) console.error(error);
-                });
+                // Render QR using proper setTimeout to ensure canvas element exists in DOM
+                setTimeout(() => {
+                    const canvasElement = document.getElementById(canvasId);
+                    if (canvasElement) {
+                        QRCode.toCanvas(canvasElement, targetUrl, { width: 120, margin: 1 }, function (error) {
+                            if (error) console.error("QR Error:", error);
+                        });
+                    }
+                }, 50);
 
                 // Save data for ZIP
                 generatedData.push({ seat, targetUrl, canvasId });
@@ -174,21 +178,6 @@
             if (generatedData.length > 0) {
                 document.getElementById('downloadZipBtn').classList.remove('hidden');
             }
-        }
-
-        async function downloadAllZip() {
-            const zip = new JSZip();
-            const folder = zip.folder("Generated_QR_Codes");
-
-            for (let item of generatedData) {
-                const canvas = document.getElementById(item.canvasId);
-                const dataUrl = canvas.toDataURL("image/png");
-                const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
-                folder.file(`QR_${item.seat}.png`, base64Data, { base64: true });
-            }
-
-            const content = await zip.generateAsync({ type: "blob" });
-            saveAs(content, "Portal_QRs.zip");
         }
     </script>
 </body>
