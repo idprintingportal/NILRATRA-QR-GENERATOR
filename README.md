@@ -97,34 +97,14 @@
         
         <!-- Left Panel: Input Fields & Photo Uploads -->
         <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-3">
-            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Input Data & Document Auto-Compress</h2>
+            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Result Image OCR & Auto Fill</h2>
             
             <!-- OCR Image Paste/Upload Box -->
             <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-3 text-center cursor-pointer hover:border-sky-400 transition focus:outline-none" id="dropZone" tabindex="0">
-                <p class="text-xs font-bold text-sky-300">📋 Click here & Press Ctrl+V to Paste OCR Result Image</p>
-                <p class="text-[10px] text-slate-400 mt-1">Or choose an OCR image file:</p>
-                <input type="file" id="imageUpload" accept="image/*" class="mt-1 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
+                <p class="text-xs font-bold text-sky-300">🖼️ Upload or drop a result image here — fields will fill automatically</p>
+                <p class="text-[10px] text-slate-400 mt-1">You can also paste a copied image with Ctrl+V.</p>
+                <input type="file" id="imageUpload" accept="image/*" class="mt-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
                 <p id="ocrStatus" class="text-[11px] text-amber-400 mt-1 font-semibold"></p>
-            </div>
-
-            <!-- 3 Document Upload Section with High-Quality Auto Compression -->
-            <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 flex flex-col gap-2">
-                <p class="text-xs font-bold text-emerald-400 uppercase">📄 Upload 3 Documents (Auto-Compress):</p>
-                
-                <div class="grid grid-cols-3 gap-2">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Doc 1:</label>
-                        <input type="file" id="photo1Input" accept="image/*" onchange="processAndCompressDocument(this)" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Doc 2:</label>
-                        <input type="file" id="photo2Input" accept="image/*" onchange="processAndCompressDocument(this)" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Doc 3:</label>
-                        <input type="file" id="photo3Input" accept="image/*" onchange="processAndCompressDocument(this)" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
-                    </div>
-                </div>
             </div>
 
             <!-- Basic Info Fields -->
@@ -255,29 +235,6 @@
     </main>
 
     <script>
-        // Compress Document Image
-        function processAndCompressDocument(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = new Image();
-                img.src = e.target.result;
-
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width > 800 ? 800 : img.width;
-                    canvas.height = (img.height * canvas.width) / img.width;
-
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    canvas.toDataURL('image/jpeg', 0.80);
-                };
-            };
-            reader.readAsDataURL(file);
-        }
-
         // Upload Preview Background Image
         function uploadCardBackground(input) {
             const file = input.files[0];
@@ -511,6 +468,16 @@
         const imageUpload = document.getElementById('imageUpload');
         const ocrStatus = document.getElementById('ocrStatus');
 
+        dropZone.addEventListener('click', event => {
+            if (event.target !== imageUpload) imageUpload.click();
+        });
+        dropZone.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                imageUpload.click();
+            }
+        });
+
         dropZone.addEventListener('paste', function(e) {
             const items = e.clipboardData?.items;
             if (!items) return;
@@ -529,50 +496,124 @@
             }
         });
 
+        ['dragenter', 'dragover'].forEach(type => dropZone.addEventListener(type, event => {
+            event.preventDefault();
+            dropZone.classList.add('border-sky-300', 'bg-slate-800');
+        }));
+        ['dragleave', 'drop'].forEach(type => dropZone.addEventListener(type, event => {
+            event.preventDefault();
+            dropZone.classList.remove('border-sky-300', 'bg-slate-800');
+        }));
+        dropZone.addEventListener('drop', event => {
+            const file = [...(event.dataTransfer?.files || [])].find(item => item.type.startsWith('image/'));
+            if (file) processImage(file);
+            else ocrStatus.textContent = 'Image file yahan drop karein.';
+        });
+
         function processImage(file) {
-            ocrStatus.innerText = "🔍 Reading image data via OCR...";
+            if (!file || !file.type.startsWith('image/')) {
+                ocrStatus.textContent = 'Kripya image file select karein.';
+                return;
+            }
+            if (!window.Tesseract) {
+                ocrStatus.textContent = 'OCR library load nahi hui. Internet check karke page reload karein.';
+                return;
+            }
+            ocrStatus.textContent = '🔍 Image read ho rahi hai: 0%';
             Tesseract.recognize(
                 file,
                 'eng',
-                { logger: m => console.log(m) }
-            ).then(({ data: { text } }) => {
-                ocrStatus.innerText = "✅ Data extracted & auto-filled successfully!";
-                parseExtractedText(text);
+                { logger: m => {
+                    if (m.status === 'recognizing text') ocrStatus.textContent = `🔍 Image read ho rahi hai: ${Math.round((m.progress || 0) * 100)}%`;
+                } }
+            ).then(({ data }) => {
+                const result = parseExtractedText(data.text, data.words);
+                const missing = result.missing.length ? ` Check: ${result.missing.join(', ')}.` : '';
+                ocrStatus.textContent = `✅ ${result.filled} fields read; barcode ready.${missing}`;
             }).catch(err => {
-                ocrStatus.innerText = "❌ Could not read image. Please try clear image.";
+                ocrStatus.textContent = '❌ Image read nahi hui. Saaf aur seedhi image try karein.';
                 console.error(err);
             });
         }
 
-        function parseExtractedText(text) {
+        function parseExtractedText(text, words = []) {
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const fieldPatterns = {
+                studentName: /(?:student|candidate)\s*name|^name$/i,
+                seatNo: /(?:seat|roll|enrol(?:l)?ment|registration)\s*(?:no\.?|number|#)/i,
+                dob: /date\s*of\s*birth|\bdob\b/i,
+                yearVal: /\byear\b/i,
+                trade: /\btrade\b/i,
+                practical: /\bpractical(?:\s*marks?)?\b/i,
+                theory: /\btheory(?:\s*marks?)?\b/i,
+                wcs: /workshop\s*(?:calculation|calc(?:ulation)?)(?:\s*(?:and|&)\s*science)?|\bwcs\b/i,
+                ed: /engineering\s*drawing|\bdrawing\b/i,
+                socialStudy: /social\s*study|\bsocial\b/i,
+                totalMarks: /total\s*marks|\btotal\b/i,
+                cutoff: /out\s*of{0,1}\s*marks|outoff\s*marks|maximum\s*marks/i
+            };
+            const found = {};
+            const knownLabel = new RegExp(Object.values(fieldPatterns).map(p => p.source).join('|'), 'i');
 
-            ['seatNo', 'studentName', 'dob', 'trade', 'practical', 'theory', 'wcs', 'ed', 'socialStudy', 'totalMarks'].forEach(id => {
-                document.getElementById(id).value = "";
+            // Read labels printed beside values, including labels and values on separate lines.
+            lines.forEach((line, index) => {
+                for (const [id, pattern] of Object.entries(fieldPatterns)) {
+                    const match = line.match(pattern);
+                    if (!match || found[id]) continue;
+                    let value = line.slice(match.index + match[0].length).replace(/^\s*[:#\-–|]+\s*/, '').trim();
+                    if (value && Object.values(fieldPatterns).some(label => label.test(value) && label.exec(value)?.index === 0)) value = '';
+                    if (!value) {
+                        const next = lines[index + 1] || '';
+                        if (next && !knownLabel.test(next)) value = next;
+                    }
+                    if (value) found[id] = value;
+                }
             });
 
-            let foundSeat = "";
-            let foundDates = [];
-
-            for (let line of lines) {
-                if (!foundSeat && /[A-Z]\d{6,10}/i.test(line)) {
-                    const match = line.match(/[A-Z]\d{6,10}/i);
-                    if (match) foundSeat = match[0];
-                }
-                if (/\d{4}[-/]\d{2}[-/]\d{2}/.test(line)) {
-                    const match = line.match(/\d{4}[-/]\d{2}[-/]\d{2}/);
-                    if (match) foundDates.push(match[0]);
+            // For a table image, use OCR word positions to map cells under their column headings.
+            if (Array.isArray(words) && words.length) {
+                const columns = [
+                    ['studentName', /^(student|candidate)$/i], ['seatNo', /^(seat|roll)$/i],
+                    ['dob', /^(birth|dob)$/i], ['yearVal', /^year$/i], ['trade', /^trade$/i],
+                    ['practical', /^practical$/i], ['theory', /^theory$/i], ['wcs', /^workshop$/i],
+                    ['ed', /^engineering$/i], ['socialStudy', /^social$/i], ['totalMarks', /^total$/i],
+                    ['cutoff', /^(outoff|outof|max)$/i]
+                ];
+                const anchors = columns.map(([id, pattern]) => {
+                    const hit = words.find(word => pattern.test(String(word.text || '').replace(/[^a-z]/gi, '')) && word.bbox);
+                    return hit ? { id, x: (hit.bbox.x0 + hit.bbox.x1) / 2, y: hit.bbox.y1 } : null;
+                }).filter(Boolean).sort((a, b) => a.x - b.x);
+                if (anchors.length >= 5) {
+                    const headerWords = /^(student|candidate|name|seat|roll|no|date|of|birth|dob|year|trade|practical|marks|theory|workshop|calculation|science|engineering|drawing|social|study|total|outoff|out|off)$/i;
+                    const headerBottom = Math.max(...words.filter(word => word.bbox && headerWords.test(String(word.text || '').replace(/[^a-z]/gi, ''))).map(word => word.bbox.y1), ...anchors.map(anchor => anchor.y)) + 3;
+                    const cells = Object.fromEntries(anchors.map(anchor => [anchor.id, []]));
+                    words.filter(word => word.bbox && word.bbox.y0 > headerBottom && !headerWords.test(String(word.text || '').replace(/[^a-z]/gi, ''))).forEach(word => {
+                        const x = (word.bbox.x0 + word.bbox.x1) / 2;
+                        let nearest = 0;
+                        anchors.forEach((anchor, i) => { if (Math.abs(anchor.x - x) < Math.abs(anchors[nearest].x - x)) nearest = i; });
+                        cells[anchors[nearest].id].push(word);
+                    });
+                    Object.entries(cells).forEach(([id, cellWords]) => {
+                        if (!found[id] && cellWords.length) found[id] = cellWords.sort((a, b) => a.bbox.y0 - b.bbox.y0 || a.bbox.x0 - b.bbox.x0).map(word => word.text).join(' ').trim();
+                    });
                 }
             }
 
-            if (foundSeat) document.getElementById('seatNo').value = foundSeat;
-            if (foundDates.length > 0) document.getElementById('dob').value = foundDates[0];
+            // Catch common values even when the image has no explicit labels.
+            const allText = lines.join(' ');
+            if (!found.seatNo) found.seatNo = allText.match(/\b[A-Z]\d{6,10}\b/i)?.[0];
+            if (!found.dob) found.dob = allText.match(/\b\d{4}[-/]\d{2}[-/]\d{2}\b/)?.[0];
+            if (!found.yearVal) found.yearVal = allText.match(/\b20\d{2}\s*(?:to|[-–])\s*20\d{2}\b/i)?.[0];
 
-            if (lines.length > 0 && !/[A-Z]\d{6,10}/i.test(lines[0])) {
-                document.getElementById('studentName').value = lines[0];
+            const ids = Object.keys(fieldPatterns);
+            ids.forEach(id => { if (found[id]) document.getElementById(id).value = found[id].replace(/\s+/g, ' ').trim(); });
+            if (!found.studentName) {
+                const nameGuess = lines.find(line => line.length > 3 && !knownLabel.test(line) && !/\d{4}[-/]\d{2}[-/]\d{2}|\b[A-Z]\d{6,10}\b/i.test(line));
+                if (nameGuess) document.getElementById('studentName').value = nameGuess;
             }
-
             generateCardQR();
+            const filled = ids.filter(id => document.getElementById(id).value.trim()).length;
+            return { filled, missing: ids.filter(id => !document.getElementById(id).value.trim()).map(id => ({studentName:'Name',seatNo:'Seat No',dob:'DOB',yearVal:'Year',trade:'Trade',practical:'Practical',theory:'Theory',wcs:'Workshop',ed:'Drawing',socialStudy:'Social',totalMarks:'Total',cutoff:'OutOff'}[id])) };
         }
 
         function showScanResultIfRequested() {
