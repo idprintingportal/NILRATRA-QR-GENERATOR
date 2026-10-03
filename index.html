@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shiv Nirmal ITI - Smart Result, Document Upload & QR Generator</title>
+    <title>Shiv Nirmal ITI - Smart Result & Clean Barcode Card Generator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Library -->
@@ -14,6 +14,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <!-- Tesseract.js for OCR Image Recognition -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        /* Custom Styling for Movable and Resizable Barcode / QR Code Box */
+        #qrMovableContainer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 120px;
+            height: 120px;
+            min-width: 50px;
+            min-height: 50px;
+            cursor: move;
+            user-select: none;
+            touch-action: none;
+            z-index: 30;
+        }
+        #qrResizeHandle {
+            position: absolute;
+            right: -6px;
+            bottom: -6px;
+            width: 14px;
+            height: 14px;
+            background-color: #0284c7;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            cursor: nwse-resize;
+            z-index: 40;
+        }
+    </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
@@ -22,9 +50,9 @@
         <div class="max-w-[96%] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    ⚡ Shiv Nirmal ITI - Smart Auto Result & Document Auto-Compressor
+                    ⚡ Shiv Nirmal ITI - Clean Image & Barcode Generator
                 </h1>
-                <p class="text-xs text-slate-400">Upload 3 Documents (Auto-Compressed), auto-fill details, generate result card with embedded QR</p>
+                <p class="text-xs text-slate-400">Upload background image, place movable/resizable QR Barcode on top, and download clean image</p>
             </div>
         </div>
     </header>
@@ -34,7 +62,7 @@
         
         <!-- Left Panel: Input Fields & Photo Uploads -->
         <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-3">
-            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Input Data & Documents Upload</h2>
+            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Input Data & Document Auto-Compress</h2>
             
             <!-- OCR Image Paste/Upload Box -->
             <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-3 text-center cursor-pointer hover:border-sky-400 transition focus:outline-none" id="dropZone" tabindex="0">
@@ -46,20 +74,20 @@
 
             <!-- 3 Document Upload Section with High-Quality Auto Compression -->
             <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 flex flex-col gap-2">
-                <p class="text-xs font-bold text-emerald-400 uppercase">📄 Upload 3 High Quality Documents (Auto-Compress):</p>
+                <p class="text-xs font-bold text-emerald-400 uppercase">📄 Upload 3 Documents (Auto-Compress):</p>
                 
                 <div class="grid grid-cols-3 gap-2">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Document 1:</label>
-                        <input type="file" id="photo1Input" accept="image/*" onchange="processAndCompressDocument(this, 'imgPreview1', 'spanPreview1')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Doc 1:</label>
+                        <input type="file" id="photo1Input" accept="image/*" onchange="processAndCompressDocument(this)" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Document 2:</label>
-                        <input type="file" id="photo2Input" accept="image/*" onchange="processAndCompressDocument(this, 'imgPreview2', 'spanPreview2')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Doc 2:</label>
+                        <input type="file" id="photo2Input" accept="image/*" onchange="processAndCompressDocument(this)" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Document 3:</label>
-                        <input type="file" id="photo3Input" accept="image/*" onchange="processAndCompressDocument(this, 'imgPreview3', 'spanPreview3')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Doc 3:</label>
+                        <input type="file" id="photo3Input" accept="image/*" onchange="processAndCompressDocument(this)" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
                     </div>
                 </div>
             </div>
@@ -116,7 +144,7 @@
                     <input type="text" id="theory" placeholder="89" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Workshop Calc & Science:</label>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Workshop Calc & Sci:</label>
                     <input type="text" id="wcs" placeholder="52" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
@@ -135,7 +163,7 @@
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Total Marks:</label>
-                    <input type="text" id="totalMarks" placeholder="Auto-calculated or manual" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none font-bold text-amber-400">
+                    <input type="text" id="totalMarks" placeholder="Auto-calculated" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none font-bold text-amber-400">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">OutOff Marks:</label>
@@ -144,92 +172,43 @@
             </div>
 
             <button onclick="generateCardQR()" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg shadow text-xs">
-                🚀 Generate Card & QR
+                🚀 Generate Barcode / QR Code
             </button>
         </section>
 
-        <!-- Right Panel: Preview Layout with Photos & QR -->
+        <!-- Right Panel: Image Upload & Barcode Only Preview -->
         <section class="lg:col-span-7 flex flex-col gap-6">
-            <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg overflow-x-auto">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-4">
-                    <h2 class="text-lg font-semibold text-emerald-400">📄 Result Card Layout Preview</h2>
-                    <button onclick="downloadCardImage()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded transition">
-                        📥 Download Card Image
-                    </button>
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
+                <div class="flex flex-wrap justify-between items-center border-b border-slate-700 pb-3 mb-4 gap-2">
+                    <h2 class="text-lg font-semibold text-emerald-400">🖼️ Image & Barcode Preview</h2>
+                    <div class="flex items-center gap-2">
+                        <!-- Custom Preview Image Upload Button -->
+                        <label class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-3 py-2 rounded cursor-pointer transition flex items-center gap-1 shadow">
+                            📁 Upload Background Image
+                            <input type="file" id="cardBgUpload" accept="image/*" onchange="uploadCardBackground(this)" class="hidden">
+                        </label>
+                        <button onclick="downloadCardImage()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded transition shadow">
+                            📥 Download Image
+                        </button>
+                    </div>
                 </div>
                 
-                <!-- Bordered Box Card Container -->
-                <div id="captureCard" class="bg-white text-slate-800 p-4 rounded-lg border-2 border-slate-400 shadow-md flex flex-col gap-4 min-w-[700px]">
-                    <div class="flex justify-between items-center border-b-2 border-slate-300 pb-2">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-900 uppercase">Shiv Nirmal ITI</h3>
-                            <p class="text-xs text-slate-500">Official Portal Result Verification Card</p>
-                        </div>
-
-                        <!-- 3 Documents Display Section in Card Header -->
-                        <div class="flex items-center gap-2">
-                            <div class="w-16 h-20 border border-slate-300 bg-slate-100 flex items-center justify-center text-[9px] text-slate-400 text-center overflow-hidden rounded">
-                                <img id="imgPreview1" class="w-full h-full object-cover hidden" alt="Document 1">
-                                <span id="spanPreview1">Document 1</span>
-                            </div>
-                            <div class="w-16 h-20 border border-slate-300 bg-slate-100 flex items-center justify-center text-[9px] text-slate-400 text-center overflow-hidden rounded">
-                                <img id="imgPreview2" class="w-full h-full object-cover hidden" alt="Document 2">
-                                <span id="spanPreview2">Document 2</span>
-                            </div>
-                            <div class="w-16 h-20 border border-slate-300 bg-slate-100 flex items-center justify-center text-[9px] text-slate-400 text-center overflow-hidden rounded">
-                                <img id="imgPreview3" class="w-full h-full object-cover hidden" alt="Document 3">
-                                <span id="spanPreview3">Document 3</span>
-                            </div>
-
-                            <!-- QR Code Box -->
-                            <div class="bg-white p-1 border border-slate-300 rounded ml-2">
-                                <canvas id="qrCanvas" class="w-20 h-20"></canvas>
-                            </div>
-                        </div>
+                <!-- Pure Image Container for Barcode Overlay -->
+                <div id="captureCard" class="bg-slate-950 rounded-lg border-2 border-slate-600 shadow-md flex items-center justify-center relative overflow-hidden min-h-[450px] w-full">
+                    
+                    <!-- Placeholder Text if no image is uploaded -->
+                    <div id="noImgText" class="text-slate-500 text-sm font-medium text-center p-6">
+                        🖼️ Upload background image using the top button.<br>Only uploaded image & barcode will be displayed and downloaded.
                     </div>
 
-                    <!-- Result Table -->
-                    <div class="overflow-x-auto">
-                        <table class="w-full border-collapse border border-slate-400 text-[10px] text-center">
-                            <thead>
-                                <tr class="bg-slate-100 text-slate-700">
-                                    <th class="border border-slate-400 p-1.5">Student Name</th>
-                                    <th class="border border-slate-400 p-1.5">Seat No</th>
-                                    <th class="border border-slate-400 p-1.5">Date Of Birth</th>
-                                    <th class="border border-slate-400 p-1.5">Year</th>
-                                    <th class="border border-slate-400 p-1.5">Trade</th>
-                                    <th class="border border-slate-400 p-1.5">Practical Marks</th>
-                                    <th class="border border-slate-400 p-1.5">Theory Marks</th>
-                                    <th class="border border-slate-400 p-1.5">Workshop Calculation Science</th>
-                                    <th class="border border-slate-400 p-1.5">Engineering Drawing</th>
-                                    <th class="border border-slate-400 p-1.5">Social Study</th>
-                                    <th class="border border-slate-400 p-1.5">Total Marks</th>
-                                    <th class="border border-slate-400 p-1.5">OutOff Marks</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td id="lblStudentName" class="border border-slate-400 p-1.5 font-medium">-</td>
-                                    <td id="lblSeatNo" class="border border-slate-400 p-1.5 font-bold text-blue-600">-</td>
-                                    <td id="lblDob" class="border border-slate-400 p-1.5">-</td>
-                                    <td id="lblYear" class="border border-slate-400 p-1.5">-</td>
-                                    <td id="lblTrade" class="border border-slate-400 p-1.5">-</td>
-                                    <td id="lblPractical" class="border border-slate-400 p-1.5">-</td>
-                                    <td id="lblTheory" class="border border-slate-400 p-1.5">-</td>
-                                    <td id="lblWcs" class="border border-slate-400 p-1.5">-</td>
-                                    <td id="lblEd" class="border border-slate-400 p-1.5">-</td>
-                                    <td id="lblSocialStudy" class="border border-slate-400 p-1.5">-</td>
-                                    <td id="lblTotal" class="border border-slate-400 p-1.5 font-bold text-emerald-700">-</td>
-                                    <td id="lblCutoff" class="border border-slate-400 p-1.5">700</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <!-- Uploaded Image Display -->
+                    <img id="cardBgImg" class="w-full h-auto object-contain hidden relative z-0" alt="Card Background">
 
-                    <!-- Dynamic Website Link Box at the Bottom -->
-                    <div class="border-t-2 border-slate-300 pt-2 flex justify-between items-center text-[10px]">
-                        <span class="text-slate-600 font-semibold">🔗 Official Search Portal Link:</span>
-                        <a id="lblPortalLink" href="#" target="_blank" class="text-blue-600 underline font-bold truncate max-w-[400px]">#</a>
+                    <!-- MOVABLE & RESIZABLE BARCODE / QR CODE CONTAINER -->
+                    <div id="qrMovableContainer" class="bg-white p-1.5 border-2 border-dashed border-sky-500 rounded shadow-2xl flex items-center justify-center">
+                        <canvas id="qrCanvas" class="w-full h-full object-contain"></canvas>
+                        <!-- Resize Handle -->
+                        <div id="qrResizeHandle" title="Drag corner to resize Barcode"></div>
                     </div>
                 </div>
             </div>
@@ -237,8 +216,8 @@
     </main>
 
     <script>
-        // High-Quality Document Processing & Smart Compression Logic
-        function processAndCompressDocument(input, targetImgId, targetSpanId) {
+        // Compress Document Image
+        function processAndCompressDocument(input) {
             const file = input.files[0];
             if (!file) return;
 
@@ -248,41 +227,31 @@
                 img.src = e.target.result;
 
                 img.onload = function () {
-                    // Maximum resolution maintained for crisp clarity
-                    const MAX_WIDTH = 800;
-                    const MAX_HEIGHT = 1000;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-
                     const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
+                    canvas.width = img.width > 800 ? 800 : img.width;
+                    canvas.height = (img.height * canvas.width) / img.width;
 
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Quality ratio at 0.82 (High quality with small file size)
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
-
-                    const imgElement = document.getElementById(targetImgId);
-                    const spanElement = document.getElementById(targetSpanId);
-
-                    imgElement.src = compressedDataUrl;
-                    imgElement.classList.remove('hidden');
-                    if (spanElement) spanElement.classList.add('hidden');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toDataURL('image/jpeg', 0.80);
                 };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Upload Preview Background Image
+        function uploadCardBackground(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const bgImg = document.getElementById('cardBgImg');
+                const noImgText = document.getElementById('noImgText');
+
+                bgImg.src = e.target.result;
+                bgImg.classList.remove('hidden');
+                if (noImgText) noImgText.classList.add('hidden');
             };
             reader.readAsDataURL(file);
         }
@@ -316,45 +285,120 @@
             const totalMarks = document.getElementById('totalMarks').value.trim() || "N/A";
             const cutoff = document.getElementById('cutoff').value.trim() || "700";
 
-            document.getElementById('lblStudentName').innerText = studentName;
-            document.getElementById('lblSeatNo').innerText = seatNo;
-            document.getElementById('lblDob').innerText = dob;
-            document.getElementById('lblYear').innerText = yearVal;
-            document.getElementById('lblTrade').innerText = trade;
-            document.getElementById('lblPractical').innerText = practical;
-            document.getElementById('lblTheory').innerText = theory;
-            document.getElementById('lblWcs').innerText = wcs;
-            document.getElementById('lblEd').innerText = ed;
-            document.getElementById('lblSocialStudy').innerText = socialStudy;
-            document.getElementById('lblTotal').innerText = totalMarks;
-            document.getElementById('lblCutoff').innerText = cutoff;
-
             const targetUrl = `${baseUrl}?course=${encodeURIComponent(courseVal)}&seat=${encodeURIComponent(seatNo)}`;
-            const linkElement = document.getElementById('lblPortalLink');
-            linkElement.href = targetUrl;
-            linkElement.innerText = targetUrl;
 
-            // QR payload with complete info and link
+            // QR code payload
             const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nWorkshop Calc & Sci: ${wcs}\nEngineering Drawing: ${ed}\nSocial Study: ${socialStudy}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nOfficial Result Search Link:\n${targetUrl}`;
 
             const canvas = document.getElementById('qrCanvas');
             setTimeout(() => {
-                QRCode.toCanvas(canvas, qrPayload, { width: 120, margin: 1 }, function (error) {
+                QRCode.toCanvas(canvas, qrPayload, { width: 300, margin: 1 }, function (error) {
                     if (error) console.error("QR Generation Error:", error);
                 });
             }, 50);
         }
 
+        // Export/Download Image with Barcode Overlay
         function downloadCardImage() {
             const cardElement = document.getElementById('captureCard');
-            html2canvas(cardElement, { scale: 3, useCORS: true }).then(canvas => {
+            const qrContainer = document.getElementById('qrMovableContainer');
+            const resizeHandle = document.getElementById('qrResizeHandle');
+
+            // Hide dashed border and handles for clean download output
+            qrContainer.classList.remove('border-2', 'border-dashed', 'border-sky-500');
+            resizeHandle.style.display = 'none';
+
+            html2canvas(cardElement, { scale: 3, useCORS: true, backgroundColor: null }).then(canvas => {
+                // Restore borders & handle
+                qrContainer.classList.add('border-2', 'border-dashed', 'border-sky-500');
+                resizeHandle.style.display = 'block';
+
                 canvas.toBlob(function(blob) {
-                    saveAs(blob, `Result_Card_${document.getElementById('seatNo').value || 'Data'}.png`);
+                    saveAs(blob, `Result_Barcode_Image_${document.getElementById('seatNo').value || 'Data'}.png`);
                 });
             });
         }
 
-        // OCR Handler
+        // --- MOVABLE AND RESIZABLE BARCODE LOGIC ---
+        const qrContainer = document.getElementById('qrMovableContainer');
+        const resizeHandle = document.getElementById('qrResizeHandle');
+        const cardParent = document.getElementById('captureCard');
+
+        let isDragging = false;
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
+
+        // Drag & Move Logic
+        qrContainer.addEventListener('mousedown', function(e) {
+            if (e.target === resizeHandle) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            const rect = qrContainer.getBoundingClientRect();
+            const parentRect = cardParent.getBoundingClientRect();
+            
+            startLeft = rect.left - parentRect.left;
+            startTop = rect.top - parentRect.top;
+
+            document.addEventListener('mousemove', onMouseMoveDrag);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        function onMouseMoveDrag(e) {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            let newLeft = startLeft + dx;
+            let newTop = startTop + dy;
+
+            const parentRect = cardParent.getBoundingClientRect();
+            const containerRect = qrContainer.getBoundingClientRect();
+
+            if (newLeft < 0) newLeft = 0;
+            if (newTop < 0) newTop = 0;
+            if (newLeft + containerRect.width > parentRect.width) newLeft = parentRect.width - containerRect.width;
+            if (newTop + containerRect.height > parentRect.height) newTop = parentRect.height - containerRect.height;
+
+            qrContainer.style.left = newLeft + 'px';
+            qrContainer.style.top = newTop + 'px';
+            qrContainer.style.right = 'auto';
+        }
+
+        // Resize Logic
+        resizeHandle.addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+            isResizing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = qrContainer.offsetWidth;
+            startHeight = qrContainer.offsetHeight;
+
+            document.addEventListener('mousemove', onMouseMoveResize);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        function onMouseMoveResize(e) {
+            if (!isResizing) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            let newSize = Math.max(50, Math.max(startWidth + dx, startHeight + dy));
+
+            qrContainer.style.width = newSize + 'px';
+            qrContainer.style.height = newSize + 'px';
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+            isResizing = false;
+            document.removeEventListener('mousemove', onMouseMoveDrag);
+            document.removeEventListener('mousemove', onMouseMoveResize);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+
+        // OCR Processing Handler
         const dropZone = document.getElementById('dropZone');
         const imageUpload = document.getElementById('imageUpload');
         const ocrStatus = document.getElementById('ocrStatus');
@@ -421,6 +465,11 @@
 
             generateCardQR();
         }
+
+        // Initialize empty QR canvas on load
+        window.onload = function() {
+            generateCardQR();
+        };
     </script>
 </body>
 </html>
