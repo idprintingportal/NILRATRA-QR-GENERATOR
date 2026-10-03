@@ -199,6 +199,10 @@
                 <div class="flex flex-wrap justify-between items-center border-b border-slate-700 pb-3 mb-4 gap-2">
                     <h2 class="text-lg font-semibold text-emerald-400">🖼️ Image & Barcode Preview</h2>
                     <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1 rounded-lg border border-slate-600 bg-slate-900 p-1" role="group" aria-label="QR code color">
+                            <button id="qrWhiteButton" type="button" aria-pressed="true" onclick="setQrColor('white')" class="rounded px-2.5 py-1.5 text-xs font-bold bg-white text-slate-900" title="Black background ke liye white QR">□ White QR</button>
+                            <button id="qrBlackButton" type="button" aria-pressed="false" onclick="setQrColor('black')" class="rounded px-2.5 py-1.5 text-xs font-bold bg-slate-700 text-white" title="White background ke liye black QR">■ Black QR</button>
+                        </div>
                         <!-- Custom Preview Image Upload Button -->
                         <label class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-3 py-2 rounded cursor-pointer transition flex items-center gap-1 shadow">
                             📁 Upload Background Image
@@ -267,6 +271,23 @@
             }
         }
 
+        let qrColor = 'white';
+
+        function setQrColor(color) {
+            qrColor = color === 'black' ? 'black' : 'white';
+            const whiteButton = document.getElementById('qrWhiteButton');
+            const blackButton = document.getElementById('qrBlackButton');
+            whiteButton.setAttribute('aria-pressed', String(qrColor === 'white'));
+            blackButton.setAttribute('aria-pressed', String(qrColor === 'black'));
+            whiteButton.className = qrColor === 'white'
+                ? 'rounded px-2.5 py-1.5 text-xs font-bold bg-white text-slate-900'
+                : 'rounded px-2.5 py-1.5 text-xs font-bold bg-slate-700 text-white';
+            blackButton.className = qrColor === 'black'
+                ? 'rounded px-2.5 py-1.5 text-xs font-bold bg-white text-slate-900'
+                : 'rounded px-2.5 py-1.5 text-xs font-bold bg-slate-700 text-white';
+            generateCardQR();
+        }
+
         function generateCardQR() {
             const baseUrl = document.getElementById('baseUrl').value.trim();
             const courseVal = document.getElementById('courseVal').value.trim();
@@ -324,7 +345,7 @@
             QRCode.toCanvas(canvas, qrPayload, {
                 width: 300,
                 margin: 4,
-                color: { dark: '#FFFFFFFF', light: '#00000000' }
+                color: { dark: qrColor === 'white' ? '#FFFFFFFF' : '#000000FF', light: '#00000000' }
             }, function (error) {
                 if (error) {
                     console.error('QR Generation Error:', error);
