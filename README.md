@@ -15,6 +15,13 @@
     <!-- Tesseract.js for OCR Image Recognition -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
+        #scanResultPage { display: none; }
+        body.result-view { background: #f8fafc; color: #1e293b; min-height: 100vh; }
+        body.result-view > header, body.result-view > main { display: none; }
+        body.result-view #scanResultPage { display: block; }
+        .result-table th, .result-table td { border: 1px solid #d1d5db; padding: 12px 14px; text-align: left; vertical-align: top; }
+        .result-table th { background: #f1f5f9; color: #334155; font-weight: 700; }
+        .result-table td { background: white; color: #475569; overflow-wrap: anywhere; }
         /* Custom Styling for Movable and Resizable Barcode / QR Code Box */
         #qrMovableContainer {
             position: absolute;
@@ -29,6 +36,13 @@
             touch-action: none;
             z-index: 30;
             box-sizing: border-box;
+        }
+        #qrCanvas {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            flex: none;
+            pointer-events: none;
         }
         /* 4 Corner Resize Handles */
         .resize-handle {
@@ -61,6 +75,22 @@
             </div>
         </div>
     </header>
+
+    <section id="scanResultPage" class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+            <div class="border-b border-slate-200 px-6 py-5 text-center">
+                <h1 class="text-2xl font-bold tracking-wide text-slate-800">Shiv Nirmal ITI</h1>
+                <p class="mt-1 text-sm text-slate-500">Student Result</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="result-table w-full min-w-[1050px] border-collapse text-sm">
+                    <thead><tr><th>Student Name</th><th>Seat No</th><th>Date Of Birth</th><th>Year</th><th>Trade</th><th>Practical Marks</th><th>Theory Marks</th><th>Workshop Calculation Science</th><th>Engineering Drawing</th><th>Social Study</th><th>Total Marks</th><th>OutOff Marks</th></tr></thead>
+                    <tbody><tr id="scanResultRow"></tr></tbody>
+                </table>
+            </div>
+        </div>
+        <p class="mt-5 text-center text-sm"><a id="officialResultLink" class="break-all font-semibold text-blue-700 underline hover:text-blue-900" target="_blank" rel="noopener noreferrer">Open Official Result</a></p>
+    </section>
 
     <!-- Main Container -->
     <main class="max-w-[96%] mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -306,7 +336,22 @@
                 return;
             }
 
-            const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nWorkshop Calc & Sci: ${wcs}\nEngineering Drawing: ${ed}\nSocial Study: ${socialStudy}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nOfficial Result Search Link:\n${targetUrl}`;
+            const resultData = {
+                name: studentName, seat: seatNo, dob, year: yearVal, trade,
+                practical, theory, wcs, ed, socialStudy, total: totalMarks, cutoff,
+                officialUrl: targetUrl
+            };
+            let qrPayload;
+            if (location.protocol === 'http:' || location.protocol === 'https:') {
+                const scanUrl = new URL(location.href);
+                scanUrl.search = '';
+                scanUrl.hash = '';
+                scanUrl.searchParams.set('result', JSON.stringify(resultData));
+                qrPayload = scanUrl.toString();
+            } else {
+                // Local file previews cannot provide a shareable formatted result page.
+                qrPayload = `SHIV NIRMAL ITI\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nWorkshop Calc & Sci: ${wcs}\nEngineering Drawing: ${ed}\nSocial Study: ${socialStudy}\nTotal: ${totalMarks} / ${cutoff}\nOfficial Result: ${targetUrl}`;
+            }
 
             const canvas = document.getElementById('qrCanvas');
             if (!window.QRCode || typeof QRCode.toCanvas !== 'function') {
@@ -379,9 +424,13 @@
             event.preventDefault();
             const handle = event.target.closest('.resize-handle');
             const point = cardPoint(event);
-            const left = qrContainer.offsetLeft;
-            const top = qrContainer.offsetTop;
-            const size = qrContainer.getBoundingClientRect().width;
+            const canvas = document.getElementById('qrCanvas');
+            const size = canvas.getBoundingClientRect().width;
+            const containerStyle = getComputedStyle(qrContainer);
+            const paddingLeft = (parseFloat(containerStyle.paddingLeft) || 0) + (parseFloat(containerStyle.borderLeftWidth) || 0);
+            const paddingTop = (parseFloat(containerStyle.paddingTop) || 0) + (parseFloat(containerStyle.borderTopWidth) || 0);
+            const left = qrContainer.offsetLeft + paddingLeft;
+            const top = qrContainer.offsetTop + paddingTop;
             interaction = {
                 pointerId: event.pointerId,
                 mode: handle ? 'resize' : 'drag',
@@ -390,6 +439,12 @@
                 startY: point.y,
                 left,
                 top,
+                boxLeft: qrContainer.offsetLeft,
+                boxTop: qrContainer.offsetTop,
+                boxWidth: qrContainer.offsetWidth,
+                boxHeight: qrContainer.offsetHeight,
+                paddingLeft,
+                paddingTop,
                 size
             };
             qrContainer.setPointerCapture(event.pointerId);
@@ -398,14 +453,22 @@
         qrContainer.addEventListener('pointermove', event => {
             if (!interaction || event.pointerId !== interaction.pointerId) return;
             const point = cardPoint(event);
-            const maxLeft = Math.max(0, cardParent.clientWidth - qrContainer.offsetWidth);
-            const maxTop = Math.max(0, cardParent.clientHeight - qrContainer.offsetHeight);
+            const canvas = document.getElementById('qrCanvas');
+            const box = getComputedStyle(qrContainer);
+            const paddingRight = parseFloat(box.paddingRight) || 0;
+            const paddingBottom = parseFloat(box.paddingBottom) || 0;
+            const canvasWidth = canvas.getBoundingClientRect().width;
+            const canvasHeight = canvas.getBoundingClientRect().height;
+            const totalWidth = canvasWidth + interaction.paddingLeft + paddingRight + 12;
+            const totalHeight = canvasHeight + interaction.paddingTop + paddingBottom + 12;
+            const maxLeft = Math.max(0, cardParent.clientWidth - totalWidth);
+            const maxTop = Math.max(0, cardParent.clientHeight - totalHeight);
 
             if (interaction.mode === 'drag') {
-                const left = clamp(interaction.left + point.x - interaction.startX, 0, maxLeft);
-                const top = clamp(interaction.top + point.y - interaction.startY, 0, maxTop);
-                qrContainer.style.left = `${left}px`;
-                qrContainer.style.top = `${top}px`;
+                const boxLeft = clamp(interaction.boxLeft + point.x - interaction.startX, 0, maxLeft);
+                const boxTop = clamp(interaction.boxTop + point.y - interaction.startY, 0, maxTop);
+                qrContainer.style.left = `${boxLeft}px`;
+                qrContainer.style.top = `${boxTop}px`;
                 qrContainer.style.right = 'auto';
                 return;
             }
@@ -418,17 +481,21 @@
             const dx = (point.x - interaction.startX) * xSign;
             const dy = (point.y - interaction.startY) * ySign;
             const minSize = 50;
-            const maxWidth = xSign < 0 ? fixedX : cardParent.clientWidth - fixedX;
-            const maxHeight = ySign < 0 ? fixedY : cardParent.clientHeight - fixedY;
+            const extraWidth = interaction.paddingLeft + paddingRight + 12;
+            const extraHeight = interaction.paddingTop + paddingBottom + 12;
+            const maxWidth = xSign < 0 ? fixedX : cardParent.clientWidth - fixedX - extraWidth;
+            const maxHeight = ySign < 0 ? fixedY : cardParent.clientHeight - fixedY - extraHeight;
             const maxSize = Math.max(minSize, Math.min(maxWidth, maxHeight));
             const size = clamp(interaction.size + Math.max(dx, dy), minSize, maxSize);
             const left = xSign < 0 ? fixedX - size : fixedX;
             const top = ySign < 0 ? fixedY - size : fixedY;
 
-            qrContainer.style.width = `${size}px`;
-            qrContainer.style.height = `${size}px`;
-            qrContainer.style.left = `${left}px`;
-            qrContainer.style.top = `${top}px`;
+            canvas.style.width = `${size}px`;
+            canvas.style.height = `${size}px`;
+            qrContainer.style.width = 'max-content';
+            qrContainer.style.height = 'max-content';
+            qrContainer.style.left = `${left - interaction.paddingLeft}px`;
+            qrContainer.style.top = `${top - interaction.paddingTop}px`;
             qrContainer.style.right = 'auto';
         });
 
@@ -508,9 +575,36 @@
             generateCardQR();
         }
 
-        // Initialize empty QR canvas on load
+        function showScanResultIfRequested() {
+            const raw = new URLSearchParams(location.search).get('result');
+            if (!raw) return;
+            try {
+                const data = JSON.parse(raw);
+                const values = [data.name, data.seat, data.dob, data.year, data.trade,
+                    data.practical, data.theory, data.wcs, data.ed, data.socialStudy,
+                    data.total, data.cutoff];
+                const row = document.getElementById('scanResultRow');
+                row.replaceChildren(...values.map(value => {
+                    const cell = document.createElement('td');
+                    cell.textContent = value ?? '';
+                    return cell;
+                }));
+                const officialUrl = new URL(data.officialUrl);
+                if (!['https:', 'http:'].includes(officialUrl.protocol)) throw new Error('Invalid official URL');
+                document.getElementById('officialResultLink').href = officialUrl.href;
+                document.body.classList.add('result-view');
+                document.title = 'Student Result - Shiv Nirmal ITI';
+            } catch (error) {
+                console.error('Could not display scan result:', error);
+                document.body.classList.add('result-view');
+                document.getElementById('scanResultPage').innerHTML = '<p class="mx-auto max-w-3xl rounded-lg bg-white p-6 text-center text-red-700 shadow">Result link is invalid or incomplete.</p>';
+            }
+        }
+
+        // Initialize result or QR view on load.
         window.onload = function() {
-            generateCardQR();
+            showScanResultIfRequested();
+            if (!new URLSearchParams(location.search).has('result')) generateCardQR();
         };
     </script>
 </body>
