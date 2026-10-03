@@ -238,7 +238,7 @@
                 </div>
                 
                 <!-- Pure Image Container for Barcode Overlay -->
-                <div id="captureCard" class="rounded-lg border border-slate-600 shadow-md">
+                <div id="captureCard">
                     
                     <!-- Placeholder Text if no image is uploaded -->
                     <!-- Uploaded Image Display -->
