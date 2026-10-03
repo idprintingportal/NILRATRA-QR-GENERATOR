@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shiv Nirmal ITI - Smart Result, Photos & QR Generator</title>
+    <title>Shiv Nirmal ITI - Smart Result, Document Upload & QR Generator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Library -->
@@ -22,9 +22,9 @@
         <div class="max-w-[96%] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    ⚡ Shiv Nirmal ITI - Smart Auto Result, 3-Photo Upload & QR Generator
+                    ⚡ Shiv Nirmal ITI - Smart Auto Result & Document Auto-Compressor
                 </h1>
-                <p class="text-xs text-slate-400">Upload 3 photos, auto-fill details, generate result card with embedded QR and direct link</p>
+                <p class="text-xs text-slate-400">Upload 3 Documents (Auto-Compressed), auto-fill details, generate result card with embedded QR</p>
             </div>
         </div>
     </header>
@@ -34,7 +34,7 @@
         
         <!-- Left Panel: Input Fields & Photo Uploads -->
         <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-3">
-            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Input Data & 3 Photos Upload</h2>
+            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Input Data & Documents Upload</h2>
             
             <!-- OCR Image Paste/Upload Box -->
             <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-3 text-center cursor-pointer hover:border-sky-400 transition focus:outline-none" id="dropZone" tabindex="0">
@@ -44,22 +44,22 @@
                 <p id="ocrStatus" class="text-[11px] text-amber-400 mt-1 font-semibold"></p>
             </div>
 
-            <!-- 3 Photo Upload Section -->
+            <!-- 3 Document Upload Section with High-Quality Auto Compression -->
             <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 flex flex-col gap-2">
-                <p class="text-xs font-bold text-emerald-400 uppercase">🖼️ Upload 3 Photos for Result Card:</p>
+                <p class="text-xs font-bold text-emerald-400 uppercase">📄 Upload 3 High Quality Documents (Auto-Compress):</p>
                 
                 <div class="grid grid-cols-3 gap-2">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Photo 1 (Student):</label>
-                        <input type="file" id="photo1Input" accept="image/*" onchange="previewPhoto(this, 'imgPreview1')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Document 1:</label>
+                        <input type="file" id="photo1Input" accept="image/*" onchange="processAndCompressDocument(this, 'imgPreview1', 'spanPreview1')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Photo 2 (Doc 1):</label>
-                        <input type="file" id="photo2Input" accept="image/*" onchange="previewPhoto(this, 'imgPreview2')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Document 2:</label>
+                        <input type="file" id="photo2Input" accept="image/*" onchange="processAndCompressDocument(this, 'imgPreview2', 'spanPreview2')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Photo 3 (Doc 2):</label>
-                        <input type="file" id="photo3Input" accept="image/*" onchange="previewPhoto(this, 'imgPreview3')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Document 3:</label>
+                        <input type="file" id="photo3Input" accept="image/*" onchange="processAndCompressDocument(this, 'imgPreview3', 'spanPreview3')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
                     </div>
                 </div>
             </div>
@@ -166,19 +166,19 @@
                             <p class="text-xs text-slate-500">Official Portal Result Verification Card</p>
                         </div>
 
-                        <!-- 3 Photos Display Section in Card Header -->
+                        <!-- 3 Documents Display Section in Card Header -->
                         <div class="flex items-center gap-2">
                             <div class="w-16 h-20 border border-slate-300 bg-slate-100 flex items-center justify-center text-[9px] text-slate-400 text-center overflow-hidden rounded">
-                                <img id="imgPreview1" class="w-full h-full object-cover hidden" alt="Student Photo">
-                                <span id="spanPreview1">Photo 1</span>
+                                <img id="imgPreview1" class="w-full h-full object-cover hidden" alt="Document 1">
+                                <span id="spanPreview1">Document 1</span>
                             </div>
                             <div class="w-16 h-20 border border-slate-300 bg-slate-100 flex items-center justify-center text-[9px] text-slate-400 text-center overflow-hidden rounded">
-                                <img id="imgPreview2" class="w-full h-full object-cover hidden" alt="Doc Photo 1">
-                                <span id="spanPreview2">Photo 2</span>
+                                <img id="imgPreview2" class="w-full h-full object-cover hidden" alt="Document 2">
+                                <span id="spanPreview2">Document 2</span>
                             </div>
                             <div class="w-16 h-20 border border-slate-300 bg-slate-100 flex items-center justify-center text-[9px] text-slate-400 text-center overflow-hidden rounded">
-                                <img id="imgPreview3" class="w-full h-full object-cover hidden" alt="Doc Photo 2">
-                                <span id="spanPreview3">Photo 3</span>
+                                <img id="imgPreview3" class="w-full h-full object-cover hidden" alt="Document 3">
+                                <span id="spanPreview3">Document 3</span>
                             </div>
 
                             <!-- QR Code Box -->
@@ -237,21 +237,54 @@
     </main>
 
     <script>
-        // Photo Preview Function
-        function previewPhoto(input, targetImgId) {
+        // High-Quality Document Processing & Smart Compression Logic
+        function processAndCompressDocument(input, targetImgId, targetSpanId) {
             const file = input.files[0];
-            const spanId = targetImgId.replace('imgPreview', 'spanPreview');
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById(targetImgId);
-                    const span = document.getElementById(spanId);
-                    img.src = e.target.result;
-                    img.classList.remove('hidden');
-                    if (span) span.classList.add('hidden');
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.src = e.target.result;
+
+                img.onload = function () {
+                    // Maximum resolution maintained for crisp clarity
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 1000;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Quality ratio at 0.82 (High quality with small file size)
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+                    const imgElement = document.getElementById(targetImgId);
+                    const spanElement = document.getElementById(targetSpanId);
+
+                    imgElement.src = compressedDataUrl;
+                    imgElement.classList.remove('hidden');
+                    if (spanElement) spanElement.classList.add('hidden');
                 };
-                reader.readAsDataURL(file);
-            }
+            };
+            reader.readAsDataURL(file);
         }
 
         function calculateTotal() {
@@ -301,7 +334,7 @@
             linkElement.href = targetUrl;
             linkElement.innerText = targetUrl;
 
-            // Text Payload encoded inside QR
+            // QR payload with complete info and link
             const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nWorkshop Calc & Sci: ${wcs}\nEngineering Drawing: ${ed}\nSocial Study: ${socialStudy}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nOfficial Result Search Link:\n${targetUrl}`;
 
             const canvas = document.getElementById('qrCanvas');
@@ -314,14 +347,14 @@
 
         function downloadCardImage() {
             const cardElement = document.getElementById('captureCard');
-            html2canvas(cardElement, { scale: 2 }).then(canvas => {
+            html2canvas(cardElement, { scale: 3, useCORS: true }).then(canvas => {
                 canvas.toBlob(function(blob) {
                     saveAs(blob, `Result_Card_${document.getElementById('seatNo').value || 'Data'}.png`);
                 });
             });
         }
 
-        // Image Paste & OCR Processing Handler
+        // OCR Handler
         const dropZone = document.getElementById('dropZone');
         const imageUpload = document.getElementById('imageUpload');
         const ocrStatus = document.getElementById('ocrStatus');
@@ -359,7 +392,6 @@
         }
 
         function parseExtractedText(text) {
-            console.log("Extracted OCR Text:\n", text);
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
             ['seatNo', 'studentName', 'dob', 'trade', 'practical', 'theory', 'wcs', 'ed', 'socialStudy', 'totalMarks'].forEach(id => {
