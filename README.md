@@ -43,6 +43,8 @@
             object-fit: fill;
             flex: none;
             pointer-events: none;
+            opacity: 1;
+            background: transparent;
         }
         /* 4 Corner Resize Handles */
         .resize-handle {
@@ -220,7 +222,7 @@
                     <img id="cardBgImg" class="w-full h-auto object-contain hidden relative z-0" alt="Card Background">
 
                     <!-- MOVABLE & RESIZABLE BARCODE / QR CODE CONTAINER -->
-                    <div id="qrMovableContainer" class="bg-white p-1.5 border-2 border-dashed border-sky-500 rounded shadow-2xl flex items-center justify-center">
+                    <div id="qrMovableContainer" class="bg-transparent p-0 border-0 rounded-none shadow-none flex items-center justify-center">
                         <canvas id="qrCanvas" class="w-full h-full object-contain"></canvas>
                         
                         <!-- 4 Corner Resize Handles -->
@@ -316,7 +318,14 @@
                 alert('QR library load nahi hui. Internet connection check karke page reload karein.');
                 return;
             }
-            QRCode.toCanvas(canvas, qrPayload, { width: 300, margin: 1 }, function (error) {
+            // Clear earlier opaque pixels before drawing transparent light modules.
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            QRCode.toCanvas(canvas, qrPayload, {
+                width: 300,
+                margin: 4,
+                color: { dark: '#FFFFFFFF', light: '#00000000' }
+            }, function (error) {
                 if (error) {
                     console.error('QR Generation Error:', error);
                     alert('QR code generate nahi hua. Input data check karke dobara try karein.');
@@ -554,15 +563,18 @@
             };
             const found = {};
             const knownLabel = new RegExp(Object.values(fieldPatterns).map(p => p.source).join('|'), 'i');
+            const nextColumnLabel = /\b(?:student\s*name|candidate\s*name|seat\s*(?:no\.?|number)|roll\s*(?:no\.?|number)|date\s*of\s*birth|birth|dob|year|trade|practical(?:\s*marks?)?|theory(?:\s*marks?)?|workshop(?:\s*(?:calculation|calc))?|calculation|science|engineering|drawing|social(?:\s*study)?|total(?:\s*marks)?|out\s*off\s*marks|out\s*of\s*marks|outoff\s*marks|maximum\s*marks)\b/i;
 
             // Read labels printed beside values, including labels and values on separate lines.
             lines.forEach((line, index) => {
+                const hasSeveralLabels = (line.match(new RegExp(nextColumnLabel.source, 'gi')) || []).length > 1;
                 for (const [id, pattern] of Object.entries(fieldPatterns)) {
                     const match = line.match(pattern);
                     if (!match || found[id]) continue;
                     let value = line.slice(match.index + match[0].length).replace(/^\s*[:#\-–|]+\s*/, '').trim();
-                    if (value && Object.values(fieldPatterns).some(label => label.test(value) && label.exec(value)?.index === 0)) value = '';
-                    if (!value) {
+                    const followingLabel = value.match(nextColumnLabel);
+                    if (followingLabel) value = value.slice(0, followingLabel.index).trim();
+                    if (!value && !hasSeveralLabels) {
                         const next = lines[index + 1] || '';
                         if (next && !knownLabel.test(next)) value = next;
                     }
@@ -574,10 +586,10 @@
             if (Array.isArray(words) && words.length) {
                 const columns = [
                     ['studentName', /^(student|candidate)$/i], ['seatNo', /^(seat|roll)$/i],
-                    ['dob', /^(birth|dob)$/i], ['yearVal', /^year$/i], ['trade', /^trade$/i],
+                    ['dob', /^(birth|dob|date)$/i], ['yearVal', /^year$/i], ['trade', /^trade$/i],
                     ['practical', /^practical$/i], ['theory', /^theory$/i], ['wcs', /^workshop$/i],
                     ['ed', /^engineering$/i], ['socialStudy', /^social$/i], ['totalMarks', /^total$/i],
-                    ['cutoff', /^(outoff|outof|max)$/i]
+                    ['cutoff', /^(outoff|outof|max|out)$/i]
                 ];
                 const anchors = columns.map(([id, pattern]) => {
                     const hit = words.find(word => pattern.test(String(word.text || '').replace(/[^a-z]/gi, '')) && word.bbox);
@@ -594,7 +606,7 @@
                         cells[anchors[nearest].id].push(word);
                     });
                     Object.entries(cells).forEach(([id, cellWords]) => {
-                        if (!found[id] && cellWords.length) found[id] = cellWords.sort((a, b) => a.bbox.y0 - b.bbox.y0 || a.bbox.x0 - b.bbox.x0).map(word => word.text).join(' ').trim();
+                        if (cellWords.length) found[id] = cellWords.sort((a, b) => a.bbox.y0 - b.bbox.y0 || a.bbox.x0 - b.bbox.x0).map(word => word.text).join(' ').trim();
                     });
                 }
             }
