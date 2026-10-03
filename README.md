@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shiv Nirmal ITI - Smart Auto OCR Result & QR Generator</title>
+    <title>Shiv Nirmal ITI - Smart Result, Photos & QR Generator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QR Code Library -->
@@ -22,9 +22,9 @@
         <div class="max-w-[96%] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    ⚡ Shiv Nirmal ITI - Smart Auto OCR Result & QR Generator
+                    ⚡ Shiv Nirmal ITI - Smart Auto Result, 3-Photo Upload & QR Generator
                 </h1>
-                <p class="text-xs text-slate-400">Paste/Upload image to auto-fill empty fields, generate card & embedded QR</p>
+                <p class="text-xs text-slate-400">Upload 3 photos, auto-fill details, generate result card with embedded QR and direct link</p>
             </div>
         </div>
     </header>
@@ -32,16 +32,36 @@
     <!-- Main Container -->
     <main class="max-w-[96%] mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left Panel: Input Fields -->
+        <!-- Left Panel: Input Fields & Photo Uploads -->
         <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-3">
-            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Smart OCR Auto-Fill & Manual Input Box</h2>
+            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Input Data & 3 Photos Upload</h2>
             
-            <!-- Paste or Upload Box -->
+            <!-- OCR Image Paste/Upload Box -->
             <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-3 text-center cursor-pointer hover:border-sky-400 transition focus:outline-none" id="dropZone" tabindex="0">
-                <p class="text-xs font-bold text-sky-300">📋 Click here & Press Ctrl+V to Paste Result Image</p>
-                <p class="text-[10px] text-slate-400 mt-1">Or choose an image file:</p>
+                <p class="text-xs font-bold text-sky-300">📋 Click here & Press Ctrl+V to Paste OCR Result Image</p>
+                <p class="text-[10px] text-slate-400 mt-1">Or choose an OCR image file:</p>
                 <input type="file" id="imageUpload" accept="image/*" class="mt-1 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
                 <p id="ocrStatus" class="text-[11px] text-amber-400 mt-1 font-semibold"></p>
+            </div>
+
+            <!-- 3 Photo Upload Section -->
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 flex flex-col gap-2">
+                <p class="text-xs font-bold text-emerald-400 uppercase">🖼️ Upload 3 Photos for Result Card:</p>
+                
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Photo 1 (Student):</label>
+                        <input type="file" id="photo1Input" accept="image/*" onchange="previewPhoto(this, 'imgPreview1')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Photo 2 (Doc 1):</label>
+                        <input type="file" id="photo2Input" accept="image/*" onchange="previewPhoto(this, 'imgPreview2')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Photo 3 (Doc 2):</label>
+                        <input type="file" id="photo3Input" accept="image/*" onchange="previewPhoto(this, 'imgPreview3')" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                    </div>
+                </div>
             </div>
 
             <!-- Basic Info Fields -->
@@ -128,7 +148,7 @@
             </button>
         </section>
 
-        <!-- Right Panel: Preview Layout -->
+        <!-- Right Panel: Preview Layout with Photos & QR -->
         <section class="lg:col-span-7 flex flex-col gap-6">
             <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg overflow-x-auto">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-4">
@@ -145,8 +165,26 @@
                             <h3 class="font-bold text-base text-slate-900 uppercase">Shiv Nirmal ITI</h3>
                             <p class="text-xs text-slate-500">Official Portal Result Verification Card</p>
                         </div>
-                        <div class="bg-white p-1 border border-slate-300 rounded">
-                            <canvas id="qrCanvas" class="w-24 h-24"></canvas>
+
+                        <!-- 3 Photos Display Section in Card Header -->
+                        <div class="flex items-center gap-2">
+                            <div class="w-16 h-20 border border-slate-300 bg-slate-100 flex items-center justify-center text-[9px] text-slate-400 text-center overflow-hidden rounded">
+                                <img id="imgPreview1" class="w-full h-full object-cover hidden" alt="Student Photo">
+                                <span id="spanPreview1">Photo 1</span>
+                            </div>
+                            <div class="w-16 h-20 border border-slate-300 bg-slate-100 flex items-center justify-center text-[9px] text-slate-400 text-center overflow-hidden rounded">
+                                <img id="imgPreview2" class="w-full h-full object-cover hidden" alt="Doc Photo 1">
+                                <span id="spanPreview2">Photo 2</span>
+                            </div>
+                            <div class="w-16 h-20 border border-slate-300 bg-slate-100 flex items-center justify-center text-[9px] text-slate-400 text-center overflow-hidden rounded">
+                                <img id="imgPreview3" class="w-full h-full object-cover hidden" alt="Doc Photo 2">
+                                <span id="spanPreview3">Photo 3</span>
+                            </div>
+
+                            <!-- QR Code Box -->
+                            <div class="bg-white p-1 border border-slate-300 rounded ml-2">
+                                <canvas id="qrCanvas" class="w-20 h-20"></canvas>
+                            </div>
                         </div>
                     </div>
 
@@ -188,7 +226,7 @@
                         </table>
                     </div>
 
-                    <!-- Portal Link Box -->
+                    <!-- Dynamic Website Link Box at the Bottom -->
                     <div class="border-t-2 border-slate-300 pt-2 flex justify-between items-center text-[10px]">
                         <span class="text-slate-600 font-semibold">🔗 Official Search Portal Link:</span>
                         <a id="lblPortalLink" href="#" target="_blank" class="text-blue-600 underline font-bold truncate max-w-[400px]">#</a>
@@ -199,6 +237,23 @@
     </main>
 
     <script>
+        // Photo Preview Function
+        function previewPhoto(input, targetImgId) {
+            const file = input.files[0];
+            const spanId = targetImgId.replace('imgPreview', 'spanPreview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById(targetImgId);
+                    const span = document.getElementById(spanId);
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    if (span) span.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function calculateTotal() {
             const practical = parseFloat(document.getElementById('practical').value) || 0;
             const theory = parseFloat(document.getElementById('theory').value) || 0;
@@ -246,11 +301,12 @@
             linkElement.href = targetUrl;
             linkElement.innerText = targetUrl;
 
-            const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nWorkshop Calc & Sci: ${wcs}\nEngineering Drawing: ${ed}\nSocial Study: ${socialStudy}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nSearch Link:\n${targetUrl}`;
+            // Text Payload encoded inside QR
+            const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nWorkshop Calc & Sci: ${wcs}\nEngineering Drawing: ${ed}\nSocial Study: ${socialStudy}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nOfficial Result Search Link:\n${targetUrl}`;
 
             const canvas = document.getElementById('qrCanvas');
             setTimeout(() => {
-                QRCode.toCanvas(canvas, qrPayload, { width: 140, margin: 1 }, function (error) {
+                QRCode.toCanvas(canvas, qrPayload, { width: 120, margin: 1 }, function (error) {
                     if (error) console.error("QR Generation Error:", error);
                 });
             }, 50);
@@ -306,7 +362,6 @@
             console.log("Extracted OCR Text:\n", text);
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-            // Clear inputs
             ['seatNo', 'studentName', 'dob', 'trade', 'practical', 'theory', 'wcs', 'ed', 'socialStudy', 'totalMarks'].forEach(id => {
                 document.getElementById(id).value = "";
             });
