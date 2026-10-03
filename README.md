@@ -42,10 +42,14 @@
             box-sizing: border-box;
         }
         #qrCanvas {
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            inset: 0;
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: fill;
-            flex: none;
             pointer-events: none;
             opacity: 1;
             background: transparent;
@@ -241,7 +245,7 @@
                     <img id="cardBgImg" class="w-full h-auto object-contain hidden relative z-0" alt="Card Background">
 
                     <!-- MOVABLE & RESIZABLE BARCODE / QR CODE CONTAINER -->
-                    <div id="qrMovableContainer" class="bg-transparent p-0 border-0 rounded-none shadow-none flex items-center justify-center">
+                    <div id="qrMovableContainer" class="bg-transparent p-0 border-0 rounded-none shadow-none">
                         <canvas id="qrCanvas" class="w-full h-full object-contain"></canvas>
                         
                         <!-- 4 Corner Resize Handles -->
@@ -502,10 +506,8 @@
             const box = getComputedStyle(qrContainer);
             const paddingRight = parseFloat(box.paddingRight) || 0;
             const paddingBottom = parseFloat(box.paddingBottom) || 0;
-            const canvasWidth = canvas.getBoundingClientRect().width;
-            const canvasHeight = canvas.getBoundingClientRect().height;
-            const totalWidth = canvasWidth + interaction.paddingLeft + paddingRight + 12;
-            const totalHeight = canvasHeight + interaction.paddingTop + paddingBottom + 12;
+            const totalWidth = qrContainer.offsetWidth;
+            const totalHeight = qrContainer.offsetHeight;
             const maxLeft = Math.max(0, cardParent.clientWidth - totalWidth);
             const maxTop = Math.max(0, cardParent.clientHeight - totalHeight);
 
@@ -526,8 +528,8 @@
             const dx = (point.x - interaction.startX) * xSign;
             const dy = (point.y - interaction.startY) * ySign;
             const minSize = 50;
-            const extraWidth = interaction.paddingLeft + paddingRight + 12;
-            const extraHeight = interaction.paddingTop + paddingBottom + 12;
+            const extraWidth = interaction.paddingLeft + paddingRight;
+            const extraHeight = interaction.paddingTop + paddingBottom;
             const maxWidth = xSign < 0 ? fixedX : cardParent.clientWidth - fixedX - extraWidth;
             const maxHeight = ySign < 0 ? fixedY : cardParent.clientHeight - fixedY - extraHeight;
             const maxSize = Math.max(minSize, Math.min(maxWidth, maxHeight));
@@ -535,10 +537,8 @@
             const left = xSign < 0 ? fixedX - size : fixedX;
             const top = ySign < 0 ? fixedY - size : fixedY;
 
-            canvas.style.width = `${size}px`;
-            canvas.style.height = `${size}px`;
-            qrContainer.style.width = 'max-content';
-            qrContainer.style.height = 'max-content';
+            qrContainer.style.width = `${size}px`;
+            qrContainer.style.height = `${size}px`;
             qrContainer.style.left = `${left - interaction.paddingLeft}px`;
             qrContainer.style.top = `${top - interaction.paddingTop}px`;
             qrContainer.style.right = 'auto';
