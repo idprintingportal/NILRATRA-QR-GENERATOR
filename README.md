@@ -19,7 +19,7 @@
 
     <!-- Header -->
     <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 shadow-md">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="max-w-[96%] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
                     ⚡ Shiv Nirmal ITI - Smart Auto OCR Result & QR Generator
@@ -30,21 +30,22 @@
     </header>
 
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <main class="max-w-[96%] mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left Panel: Smart Paste/Upload & Manual Data Inputs -->
+        <!-- Left Panel: Input Fields -->
         <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-3">
-            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Smart OCR Auto-Fill Box</h2>
+            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Smart OCR Auto-Fill & Manual Input Box</h2>
             
             <!-- Paste or Upload Box -->
-            <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-4 text-center cursor-pointer hover:border-sky-400 transition focus:outline-none" id="dropZone" tabindex="0">
+            <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-3 text-center cursor-pointer hover:border-sky-400 transition focus:outline-none" id="dropZone" tabindex="0">
                 <p class="text-xs font-bold text-sky-300">📋 Click here & Press Ctrl+V to Paste Result Image</p>
                 <p class="text-[10px] text-slate-400 mt-1">Or choose an image file:</p>
-                <input type="file" id="imageUpload" accept="image/*" class="mt-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
-                <p id="ocrStatus" class="text-[11px] text-amber-400 mt-2 font-semibold"></p>
+                <input type="file" id="imageUpload" accept="image/*" class="mt-1 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
+                <p id="ocrStatus" class="text-[11px] text-amber-400 mt-1 font-semibold"></p>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 mt-1">
+            <!-- Basic Info Fields -->
+            <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Base URL:</label>
                     <input type="text" id="baseUrl" value="https://nemrc.co.in/result.php" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
@@ -58,11 +59,11 @@
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Student Name:</label>
-                    <input type="text" id="studentName" placeholder="Auto-filled from image" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="studentName" placeholder="e.g. Roshan Bistur sawara" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Seat Number:</label>
-                    <input type="text" id="seatNo" placeholder="Auto-filled from image" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="seatNo" placeholder="e.g. A1321789" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
@@ -84,21 +85,40 @@
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Practical Marks:</label>
-                    <input type="text" id="practical" placeholder="Practical Marks" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <input type="text" id="practical" placeholder="331" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-2">
+            <!-- Subject Marks Fields -->
+            <div class="grid grid-cols-2 gap-2">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Theory Marks:</label>
-                    <input type="text" id="theory" placeholder="Theory" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Theory Marks:</label>
+                    <input type="text" id="theory" placeholder="89" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Total Marks:</label>
-                    <input type="text" id="totalMarks" placeholder="Total" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Workshop Calc & Science:</label>
+                    <input type="text" id="wcs" placeholder="52" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Engineering Drawing:</label>
+                    <input type="text" id="ed" placeholder="44" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">OutOff Marks:</label>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Social Study:</label>
+                    <input type="text" id="socialStudy" placeholder="41" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Total Marks:</label>
+                    <input type="text" id="totalMarks" placeholder="Auto-calculated or manual" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none font-bold text-amber-400">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">OutOff Marks:</label>
                     <input type="text" id="cutoff" value="700" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
                 </div>
             </div>
@@ -108,10 +128,9 @@
             </button>
         </section>
 
-        <!-- Right Panel: Preview Layout with Boxes & Lines -->
+        <!-- Right Panel: Preview Layout -->
         <section class="lg:col-span-7 flex flex-col gap-6">
-            
-            <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg overflow-x-auto">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-4">
                     <h2 class="text-lg font-semibold text-emerald-400">📄 Result Card Layout Preview</h2>
                     <button onclick="downloadCardImage()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded transition">
@@ -119,21 +138,21 @@
                     </button>
                 </div>
                 
-                <!-- Bordered Box Card Container matching portal style -->
-                <div id="captureCard" class="bg-white text-slate-800 p-4 rounded-lg border-2 border-slate-400 shadow-md flex flex-col gap-4">
+                <!-- Bordered Box Card Container -->
+                <div id="captureCard" class="bg-white text-slate-800 p-4 rounded-lg border-2 border-slate-400 shadow-md flex flex-col gap-4 min-w-[700px]">
                     <div class="flex justify-between items-center border-b-2 border-slate-300 pb-2">
                         <div>
-                            <h3 class="font-bold text-sm text-slate-900 uppercase">Shiv Nirmal ITI</h3>
-                            <p class="text-[10px] text-slate-500">Official Portal Result Verification Card</p>
+                            <h3 class="font-bold text-base text-slate-900 uppercase">Shiv Nirmal ITI</h3>
+                            <p class="text-xs text-slate-500">Official Portal Result Verification Card</p>
                         </div>
                         <div class="bg-white p-1 border border-slate-300 rounded">
                             <canvas id="qrCanvas" class="w-24 h-24"></canvas>
                         </div>
                     </div>
 
-                    <!-- Table with explicit borders and boxes -->
+                    <!-- Result Table -->
                     <div class="overflow-x-auto">
-                        <table class="w-full border-collapse border border-slate-400 text-[11px] text-center">
+                        <table class="w-full border-collapse border border-slate-400 text-[10px] text-center">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-700">
                                     <th class="border border-slate-400 p-1.5">Student Name</th>
@@ -141,10 +160,13 @@
                                     <th class="border border-slate-400 p-1.5">Date Of Birth</th>
                                     <th class="border border-slate-400 p-1.5">Year</th>
                                     <th class="border border-slate-400 p-1.5">Trade</th>
-                                    <th class="border border-slate-400 p-1.5">Practical</th>
-                                    <th class="border border-slate-400 p-1.5">Theory</th>
-                                    <th class="border border-slate-400 p-1.5">Total</th>
-                                    <th class="border border-slate-400 p-1.5">OutOff</th>
+                                    <th class="border border-slate-400 p-1.5">Practical Marks</th>
+                                    <th class="border border-slate-400 p-1.5">Theory Marks</th>
+                                    <th class="border border-slate-400 p-1.5">Workshop Calculation Science</th>
+                                    <th class="border border-slate-400 p-1.5">Engineering Drawing</th>
+                                    <th class="border border-slate-400 p-1.5">Social Study</th>
+                                    <th class="border border-slate-400 p-1.5">Total Marks</th>
+                                    <th class="border border-slate-400 p-1.5">OutOff Marks</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -156,25 +178,40 @@
                                     <td id="lblTrade" class="border border-slate-400 p-1.5">-</td>
                                     <td id="lblPractical" class="border border-slate-400 p-1.5">-</td>
                                     <td id="lblTheory" class="border border-slate-400 p-1.5">-</td>
-                                    <td id="lblTotal" class="border border-slate-400 p-1.5 font-bold">-</td>
+                                    <td id="lblWcs" class="border border-slate-400 p-1.5">-</td>
+                                    <td id="lblEd" class="border border-slate-400 p-1.5">-</td>
+                                    <td id="lblSocialStudy" class="border border-slate-400 p-1.5">-</td>
+                                    <td id="lblTotal" class="border border-slate-400 p-1.5 font-bold text-emerald-700">-</td>
                                     <td id="lblCutoff" class="border border-slate-400 p-1.5">700</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- Original Portal Link Box at the bottom -->
+                    <!-- Portal Link Box -->
                     <div class="border-t-2 border-slate-300 pt-2 flex justify-between items-center text-[10px]">
                         <span class="text-slate-600 font-semibold">🔗 Official Search Portal Link:</span>
-                        <a id="lblPortalLink" href="#" target="_blank" class="text-blue-600 underline font-bold truncate max-w-[280px]">#</a>
+                        <a id="lblPortalLink" href="#" target="_blank" class="text-blue-600 underline font-bold truncate max-w-[400px]">#</a>
                     </div>
                 </div>
             </div>
-
         </section>
     </main>
 
     <script>
+        function calculateTotal() {
+            const practical = parseFloat(document.getElementById('practical').value) || 0;
+            const theory = parseFloat(document.getElementById('theory').value) || 0;
+            const wcs = parseFloat(document.getElementById('wcs').value) || 0;
+            const ed = parseFloat(document.getElementById('ed').value) || 0;
+            const socialStudy = parseFloat(document.getElementById('socialStudy').value) || 0;
+
+            const sum = practical + theory + wcs + ed + socialStudy;
+            if (sum > 0) {
+                document.getElementById('totalMarks').value = sum;
+            }
+        }
+
         function generateCardQR() {
             const baseUrl = document.getElementById('baseUrl').value.trim();
             const courseVal = document.getElementById('courseVal').value.trim();
@@ -185,6 +222,9 @@
             const trade = document.getElementById('trade').value.trim() || "N/A";
             const practical = document.getElementById('practical').value.trim() || "N/A";
             const theory = document.getElementById('theory').value.trim() || "N/A";
+            const wcs = document.getElementById('wcs').value.trim() || "N/A";
+            const ed = document.getElementById('ed').value.trim() || "N/A";
+            const socialStudy = document.getElementById('socialStudy').value.trim() || "N/A";
             const totalMarks = document.getElementById('totalMarks').value.trim() || "N/A";
             const cutoff = document.getElementById('cutoff').value.trim() || "700";
 
@@ -195,6 +235,9 @@
             document.getElementById('lblTrade').innerText = trade;
             document.getElementById('lblPractical').innerText = practical;
             document.getElementById('lblTheory').innerText = theory;
+            document.getElementById('lblWcs').innerText = wcs;
+            document.getElementById('lblEd').innerText = ed;
+            document.getElementById('lblSocialStudy').innerText = socialStudy;
             document.getElementById('lblTotal').innerText = totalMarks;
             document.getElementById('lblCutoff').innerText = cutoff;
 
@@ -203,7 +246,7 @@
             linkElement.href = targetUrl;
             linkElement.innerText = targetUrl;
 
-            const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nSearch Link:\n${targetUrl}`;
+            const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nWorkshop Calc & Sci: ${wcs}\nEngineering Drawing: ${ed}\nSocial Study: ${socialStudy}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nSearch Link:\n${targetUrl}`;
 
             const canvas = document.getElementById('qrCanvas');
             setTimeout(() => {
@@ -263,26 +306,19 @@
             console.log("Extracted OCR Text:\n", text);
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-            // Clear inputs first
-            document.getElementById('seatNo').value = "";
-            document.getElementById('studentName').value = "";
-            document.getElementById('dob').value = "";
-            document.getElementById('trade').value = "";
-            document.getElementById('practical').value = "";
-            document.getElementById('theory').value = "";
-            document.getElementById('totalMarks').value = "";
+            // Clear inputs
+            ['seatNo', 'studentName', 'dob', 'trade', 'practical', 'theory', 'wcs', 'ed', 'socialStudy', 'totalMarks'].forEach(id => {
+                document.getElementById(id).value = "";
+            });
 
             let foundSeat = "";
             let foundDates = [];
-            let foundNumbers = [];
 
             for (let line of lines) {
-                // Match seat number pattern (e.g. A followed by numbers)
-                if (!foundSeat && /[A-Z]\d{6,10}/.test(line)) {
-                    const match = line.match(/[A-Z]\d{6,10}/);
+                if (!foundSeat && /[A-Z]\d{6,10}/i.test(line)) {
+                    const match = line.match(/[A-Z]\d{6,10}/i);
                     if (match) foundSeat = match[0];
                 }
-                // Match Date format
                 if (/\d{4}[-/]\d{2}[-/]\d{2}/.test(line)) {
                     const match = line.match(/\d{4}[-/]\d{2}[-/]\d{2}/);
                     if (match) foundDates.push(match[0]);
@@ -292,16 +328,10 @@
             if (foundSeat) document.getElementById('seatNo').value = foundSeat;
             if (foundDates.length > 0) document.getElementById('dob').value = foundDates[0];
 
-            // Assign lines heuristically or leave open for manual fine-tuning if needed, 
-            // but fill whatever valid text blocks were found.
-            if (lines.length > 0) {
-                // If first line isn't a code, treat as student name
-                if (!/[A-Z]\d{6,10}/.test(lines[0])) {
-                    document.getElementById('studentName').value = lines[0];
-                }
+            if (lines.length > 0 && !/[A-Z]\d{6,10}/i.test(lines[0])) {
+                document.getElementById('studentName').value = lines[0];
             }
 
-            // Automatically generate card and QR with filled data
             generateCardQR();
         }
     </script>
