@@ -14,6 +14,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <!-- Tesseract.js for OCR Image Recognition -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- PDF.js for rendering uploaded PDF pages in the A4 preview -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         #scanResultPage { display: none; }
         body.result-view { background: #f8fafc; color: #1e293b; min-height: 100vh; }
@@ -25,10 +27,12 @@
         /* Custom Styling for Movable and Resizable Barcode / QR Code Box */
         #qrMovableContainer {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 120px;
-            height: 120px;
+            top: 75.8%;
+            left: 12.2%;
+            right: auto;
+            width: 12.4%;
+            height: auto;
+            aspect-ratio: 1 / 1;
             min-width: 50px;
             min-height: 50px;
             cursor: move;
@@ -45,6 +49,21 @@
             pointer-events: none;
             opacity: 1;
             background: transparent;
+        }
+        #captureCard {
+            position: relative;
+            width: min(100%, 700px);
+            aspect-ratio: 210 / 297;
+            margin-inline: auto;
+            overflow: hidden;
+            background: #fff;
+        }
+        #cardBgImg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
         }
         /* 4 Corner Resize Handles */
         .resize-handle {
@@ -200,13 +219,13 @@
                     <h2 class="text-lg font-semibold text-emerald-400">🖼️ Image & Barcode Preview</h2>
                     <div class="flex items-center gap-2">
                         <div class="flex items-center gap-1 rounded-lg border border-slate-600 bg-slate-900 p-1" role="group" aria-label="QR code color">
-                            <button id="qrWhiteButton" type="button" aria-pressed="true" onclick="setQrColor('white')" class="rounded px-2.5 py-1.5 text-xs font-bold bg-white text-slate-900" title="Black background ke liye white QR">□ White QR</button>
-                            <button id="qrBlackButton" type="button" aria-pressed="false" onclick="setQrColor('black')" class="rounded px-2.5 py-1.5 text-xs font-bold bg-slate-700 text-white" title="White background ke liye black QR">■ Black QR</button>
+                            <button id="qrWhiteButton" type="button" aria-pressed="false" onclick="setQrColor('white')" class="rounded px-2.5 py-1.5 text-xs font-bold bg-slate-700 text-white" title="Black background ke liye white QR">□ White QR</button>
+                            <button id="qrBlackButton" type="button" aria-pressed="true" onclick="setQrColor('black')" class="rounded px-2.5 py-1.5 text-xs font-bold bg-white text-slate-900" title="White background ke liye black QR">■ Black QR</button>
                         </div>
                         <!-- Custom Preview Image Upload Button -->
                         <label class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-3 py-2 rounded cursor-pointer transition flex items-center gap-1 shadow">
-                            📁 Upload Background Image
-                            <input type="file" id="cardBgUpload" accept="image/*" onchange="uploadCardBackground(this)" class="hidden">
+                            📁 Upload PDF / Image
+                            <input type="file" id="cardBgUpload" accept="image/*,application/pdf,.pdf" onchange="uploadCardBackground(this)" class="hidden">
                         </label>
                         <button onclick="downloadCardImage()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded transition shadow">
                             📥 Download Image
@@ -215,13 +234,9 @@
                 </div>
                 
                 <!-- Pure Image Container for Barcode Overlay -->
-                <div id="captureCard" class="bg-slate-950 rounded-lg border-2 border-slate-600 shadow-md flex items-center justify-center relative overflow-hidden min-h-[450px] w-full">
+                <div id="captureCard" class="rounded-lg border border-slate-600 shadow-md">
                     
                     <!-- Placeholder Text if no image is uploaded -->
-                    <div id="noImgText" class="text-slate-500 text-sm font-medium text-center p-6">
-                        🖼️ Upload background image using the top button.<br>Only uploaded image & barcode will be displayed and downloaded.
-                    </div>
-
                     <!-- Uploaded Image Display -->
                     <img id="cardBgImg" class="w-full h-auto object-contain hidden relative z-0" alt="Card Background">
 
@@ -241,21 +256,64 @@
     </main>
 
     <script>
-        // Upload Preview Background Image
-        function uploadCardBackground(input) {
-            const file = input.files[0];
+        // Show an image or the first page of a PDF on the A4 sheet.
+        async function uploadCardBackground(input) {
+            const file = input.files?.[0];
             if (!file) return;
+            const bgImg = document.getElementById('cardBgImg');
+            const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            try {
+                let dataUrl;
+                if (isPdf) {
+                    if (!window.pdfjsLib) throw new Error('PDF reader library did not load');
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+                    const page = await pdf.getPage(1);
+                    const viewport = page.getViewport({ scale: 2 });
+                    const pageCanvas = document.createElement('canvas');
+                    pageCanvas.width = Math.ceil(viewport.width);
+                    pageCanvas.height = Math.ceil(viewport.height);
+                    await page.render({ canvasContext: pageCanvas.getContext('2d'), viewport }).promise;
+                    dataUrl = pageCanvas.toDataURL('image/png');
+                } else if (file.type.startsWith('image/')) {
+                    dataUrl = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = () => reject(reader.error || new Error('Image read failed'));
+                        reader.readAsDataURL(file);
+                    });
+                } else {
+                    throw new Error('Please select a PDF or image file');
+                }
 
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const bgImg = document.getElementById('cardBgImg');
-                const noImgText = document.getElementById('noImgText');
+                await new Promise((resolve, reject) => {
+                    bgImg.onload = resolve;
+                    bgImg.onerror = reject;
+                    bgImg.src = dataUrl;
+                    bgImg.classList.remove('hidden');
+                    if (bgImg.complete && bgImg.naturalWidth) resolve();
+                });
+                setQrColor(samplePageColor(bgImg) === 'dark' ? 'white' : 'black');
+            } catch (error) {
+                console.error('Background upload error:', error);
+                alert(`PDF/Image load nahi hui: ${error.message}`);
+            } finally {
+                input.value = '';
+            }
+        }
 
-                bgImg.src = e.target.result;
-                bgImg.classList.remove('hidden');
-                if (noImgText) noImgText.classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
+        function samplePageColor(image) {
+            const sample = document.createElement('canvas');
+            sample.width = 24;
+            sample.height = 34;
+            const context = sample.getContext('2d', { willReadFrequently: true });
+            context.drawImage(image, 0, 0, sample.width, sample.height);
+            const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
+            let luminance = 0;
+            for (let i = 0; i < pixels.length; i += 4) {
+                luminance += pixels[i] * 0.299 + pixels[i + 1] * 0.587 + pixels[i + 2] * 0.114;
+            }
+            return luminance / (pixels.length / 4) < 128 ? 'dark' : 'light';
         }
 
         function calculateTotal() {
@@ -271,7 +329,7 @@
             }
         }
 
-        let qrColor = 'white';
+        let qrColor = 'black';
 
         function setQrColor(color) {
             qrColor = color === 'black' ? 'black' : 'white';
