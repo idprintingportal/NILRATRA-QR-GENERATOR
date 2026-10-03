@@ -15,32 +15,41 @@
     <!-- Tesseract.js for OCR Image Recognition -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
-        /* Custom Styling for Movable and Resizable Barcode / QR Code Box */
+        /* Custom Styling for Movable and 8-Handle Resizable QR Code Box */
         #qrMovableContainer {
             position: absolute;
             top: 20px;
             right: 20px;
             width: 120px;
             height: 120px;
-            min-width: 50px;
-            min-height: 50px;
+            min-width: 40px;
+            min-height: 40px;
             cursor: move;
             user-select: none;
             touch-action: none;
             z-index: 30;
         }
-        #qrResizeHandle {
+
+        /* Resize Handles CSS */
+        .resize-handle {
             position: absolute;
-            right: -6px;
-            bottom: -6px;
-            width: 14px;
-            height: 14px;
+            width: 10px;
+            height: 10px;
             background-color: #0284c7;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            cursor: nwse-resize;
+            border: 1.5px solid #ffffff;
+            border-radius: 2px;
             z-index: 40;
         }
+
+        .handle-tl { top: -5px; left: -5px; cursor: nwse-resize; }
+        .handle-tr { top: -5px; right: -5px; cursor: nesw-resize; }
+        .handle-bl { bottom: -5px; left: -5px; cursor: nesw-resize; }
+        .handle-br { bottom: -5px; right: -5px; cursor: nwse-resize; }
+        
+        .handle-t { top: -5px; left: calc(50% - 5px); cursor: ns-resize; }
+        .handle-b { bottom: -5px; left: calc(50% - 5px); cursor: ns-resize; }
+        .handle-l { top: calc(50% - 5px); left: -5px; cursor: ew-resize; }
+        .handle-r { top: calc(50% - 5px); right: -5px; cursor: ew-resize; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
@@ -204,11 +213,236 @@
                     <!-- Uploaded Image Display -->
                     <img id="cardBgImg" class="w-full h-auto object-contain hidden relative z-0" alt="Card Background">
 
+                    <!-- MOVABLE & RESIZABLE BARCODE / QR CODE CONTAINER (WITH 8 HANDLES) -->
+                    <div id="qrMovableContainer" class="bg-white p-1.5 border-2 border-dashed border-sky-500 rounded shadow-2xl flex items-center justify-center">
+                        <canvas id="qrCanvas" class="w-full h-full object-contain"></canvas>
+                        
+                        <!-- 8 Resize Box Handles -->
+                        <div class="resize-handle handle-tl" data-handle="tl"></div>
+                        <div class="resize-handle handle-tr" data-handle="tr"></div>
+                        <div class="resize-handle handle-bl" data-handle="bl"></div>
+                        <div class="resize-Aapke requirement ke hisab se `index.html` code mein QR code container ke chaaro corners par 4 chote resize handles (boxes) add kar diye gaye hain. Ab aap kisi bhi kone (corner) ke box ko pakad kar QR code ka size chota ya bada kar sakte hain.
+
+Poora updated code neeche diya gaya hai:
+
+```html
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shiv Nirmal ITI - Smart Result & Clean Barcode Card Generator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <!-- QR Code Library -->
+    <script src="[https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js](https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js)"></script>
+    <!-- html2canvas for card image export -->
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js](https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js)"></script>
+    <!-- FileSaver Library -->
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js](https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js)"></script>
+    <!-- Tesseract.js for OCR Image Recognition -->
+    <script src="[https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js](https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js)"></script>
+    <style>
+        /* Custom Styling for Movable and Resizable Barcode / QR Code Box */
+        #qrMovableContainer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 120px;
+            height: 120px;
+            min-width: 50px;
+            min-height: 50px;
+            cursor: move;
+            user-select: none;
+            touch-action: none;
+            z-index: 30;
+        }
+        /* 4 Corner Resize Handles */
+        .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #0284c7;
+            border: 1.5px solid #ffffff;
+            border-radius: 2px;
+            z-index: 40;
+        }
+        .handle-tl { top: -5px; left: -5px; cursor: nwse-resize; }
+        .handle-tr { top: -5px; right: -5px; cursor: nesw-resize; }
+        .handle-bl { bottom: -5px; left: -5px; cursor: nesw-resize; }
+        .handle-br { bottom: -5px; right: -5px; cursor: nwse-resize; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 shadow-md">
+        <div class="max-w-[96%] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                    ⚡ Shiv Nirmal ITI - Clean Image & Barcode Generator
+                </h1>
+                <p class="text-xs text-slate-400">Upload background image, place movable/resizable QR Barcode on top, and download clean image</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-[96%] mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Panel: Input Fields & Photo Uploads -->
+        <section class="lg:col-span-5 bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col gap-3">
+            <h2 class="text-lg font-semibold text-sky-400 border-b border-slate-700 pb-2">📥 Input Data & Document Auto-Compress</h2>
+            
+            <!-- OCR Image Paste/Upload Box -->
+            <div class="bg-slate-900 border-2 border-dashed border-sky-500/50 rounded-lg p-3 text-center cursor-pointer hover:border-sky-400 transition focus:outline-none" id="dropZone" tabindex="0">
+                <p class="text-xs font-bold text-sky-300">📋 Click here & Press Ctrl+V to Paste OCR Result Image</p>
+                <p class="text-[10px] text-slate-400 mt-1">Or choose an OCR image file:</p>
+                <input type="file" id="imageUpload" accept="image/*" class="mt-1 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
+                <p id="ocrStatus" class="text-[11px] text-amber-400 mt-1 font-semibold"></p>
+            </div>
+
+            <!-- 3 Document Upload Section with High-Quality Auto Compression -->
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 flex flex-col gap-2">
+                <p class="text-xs font-bold text-emerald-400 uppercase">📄 Upload 3 Documents (Auto-Compress):</p>
+                
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Doc 1:</label>
+                        <input type="file" id="photo1Input" accept="image/*" onchange="processAndCompressDocument(this)" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Doc 2:</label>
+                        <input type="file" id="photo2Input" accept="image/*" onchange="processAndCompressDocument(this)" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Doc 3:</label>
+                        <input type="file" id="photo3Input" accept="image/*" onchange="processAndCompressDocument(this)" class="w-full text-[10px] text-slate-400 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:bg-emerald-600 file:text-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Basic Info Fields -->
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Base URL:</label>
+                    <input type="text" id="baseUrl" value="[https://nemrc.co.in/result.php](https://nemrc.co.in/result.php)" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Course:</label>
+                    <input type="text" id="courseVal" value="ITI" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Student Name:</label>
+                    <input type="text" id="studentName" placeholder="e.g. Roshan Bistur sawara" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Seat Number:</label>
+                    <input type="text" id="seatNo" placeholder="e.g. A1321789" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Date Of Birth:</label>
+                    <input type="text" id="dob" placeholder="YYYY-MM-DD" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Year:</label>
+                    <input type="text" id="yearVal" placeholder="2023 to 2025" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Trade:</label>
+                    <input type="text" id="trade" placeholder="Electrician" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Practical Marks:</label>
+                    <input type="text" id="practical" placeholder="331" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+            </div>
+
+            <!-- Subject Marks Fields -->
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Theory Marks:</label>
+                    <input type="text" id="theory" placeholder="89" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Workshop Calc & Sci:</label>
+                    <input type="text" id="wcs" placeholder="52" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Engineering Drawing:</label>
+                    <input type="text" id="ed" placeholder="44" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Social Study:</label>
+                    <input type="text" id="socialStudy" placeholder="41" oninput="calculateTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Total Marks:</label>
+                    <input type="text" id="totalMarks" placeholder="Auto-calculated" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none font-bold text-amber-400">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">OutOff Marks:</label>
+                    <input type="text" id="cutoff" value="700" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200 outline-none">
+                </div>
+            </div>
+
+            <button onclick="generateCardQR()" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg shadow text-xs">
+                🚀 Generate Barcode / QR Code
+            </button>
+        </section>
+
+        <!-- Right Panel: Image Upload & Barcode Only Preview -->
+        <section class="lg:col-span-7 flex flex-col gap-6">
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
+                <div class="flex flex-wrap justify-between items-center border-b border-slate-700 pb-3 mb-4 gap-2">
+                    <h2 class="text-lg font-semibold text-emerald-400">🖼️ Image & Barcode Preview</h2>
+                    <div class="flex items-center gap-2">
+                        <!-- Custom Preview Image Upload Button -->
+                        <label class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-3 py-2 rounded cursor-pointer transition flex items-center gap-1 shadow">
+                            📁 Upload Background Image
+                            <input type="file" id="cardBgUpload" accept="image/*" onchange="uploadCardBackground(this)" class="hidden">
+                        </label>
+                        <button onclick="downloadCardImage()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded transition shadow">
+                            📥 Download Image
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Pure Image Container for Barcode Overlay -->
+                <div id="captureCard" class="bg-slate-950 rounded-lg border-2 border-slate-600 shadow-md flex items-center justify-center relative overflow-hidden min-h-[450px] w-full">
+                    
+                    <!-- Placeholder Text if no image is uploaded -->
+                    <div id="noImgText" class="text-slate-500 text-sm font-medium text-center p-6">
+                        🖼️ Upload background image using the top button.<br>Only uploaded image & barcode will be displayed and downloaded.
+                    </div>
+
+                    <!-- Uploaded Image Display -->
+                    <img id="cardBgImg" class="w-full h-auto object-contain hidden relative z-0" alt="Card Background">
+
                     <!-- MOVABLE & RESIZABLE BARCODE / QR CODE CONTAINER -->
                     <div id="qrMovableContainer" class="bg-white p-1.5 border-2 border-dashed border-sky-500 rounded shadow-2xl flex items-center justify-center">
                         <canvas id="qrCanvas" class="w-full h-full object-contain"></canvas>
-                        <!-- Resize Handle -->
-                        <div id="qrResizeHandle" title="Drag corner to resize Barcode"></div>
+                        
+                        <!-- 4 Corner Resize Handles -->
+                        <div class="resize-handle handle-tl" data-handle="tl" title="Resize Top-Left"></div>
+                        <div class="resize-handle handle-tr" data-handle="tr" title="Resize Top-Right"></div>
+                        <div class="resize-handle handle-bl" data-handle="bl" title="Resize Bottom-Left"></div>
+                        <div class="resize-handle handle-br" data-handle="br" title="Resize Bottom-Right"></div>
                     </div>
                 </div>
             </div>
@@ -287,7 +521,6 @@
 
             const targetUrl = `${baseUrl}?course=${encodeURIComponent(courseVal)}&seat=${encodeURIComponent(seatNo)}`;
 
-            // QR code payload
             const qrPayload = `=========================\nSHIV NIRMAL ITI\n=========================\nStudent Name: ${studentName}\nSeat No: ${seatNo}\nDOB: ${dob}\nYear: ${yearVal}\nTrade: ${trade}\nPractical: ${practical}\nTheory: ${theory}\nWorkshop Calc & Sci: ${wcs}\nEngineering Drawing: ${ed}\nSocial Study: ${socialStudy}\nTotal: ${totalMarks} / ${cutoff}\n-------------------------\nOfficial Result Search Link:\n${targetUrl}`;
 
             const canvas = document.getElementById('qrCanvas');
@@ -302,16 +535,16 @@
         function downloadCardImage() {
             const cardElement = document.getElementById('captureCard');
             const qrContainer = document.getElementById('qrMovableContainer');
-            const resizeHandle = document.getElementById('qrResizeHandle');
+            const resizeHandles = document.querySelectorAll('.resize-handle');
 
-            // Hide dashed border and handles for clean download output
+            // Hide dashed border and 4 handles for clean download output
             qrContainer.classList.remove('border-2', 'border-dashed', 'border-sky-500');
-            resizeHandle.style.display = 'none';
+            resizeHandles.forEach(h => h.style.display = 'none');
 
             html2canvas(cardElement, { scale: 3, useCORS: true, backgroundColor: null }).then(canvas => {
-                // Restore borders & handle
+                // Restore borders & handles
                 qrContainer.classList.add('border-2', 'border-dashed', 'border-sky-500');
-                resizeHandle.style.display = 'block';
+                resizeHandles.forEach(h => h.style.display = 'block');
 
                 canvas.toBlob(function(blob) {
                     saveAs(blob, `Result_Barcode_Image_${document.getElementById('seatNo').value || 'Data'}.png`);
@@ -319,18 +552,18 @@
             });
         }
 
-        // --- MOVABLE AND RESIZABLE BARCODE LOGIC ---
+        // --- MOVABLE AND RESIZABLE BARCODE LOGIC (4 CORNERS) ---
         const qrContainer = document.getElementById('qrMovableContainer');
-        const resizeHandle = document.getElementById('qrResizeHandle');
         const cardParent = document.getElementById('captureCard');
 
         let isDragging = false;
         let isResizing = false;
+        let currentHandle = null;
         let startX, startY, startWidth, startHeight, startLeft, startTop;
 
         // Drag & Move Logic
         qrContainer.addEventListener('mousedown', function(e) {
-            if (e.target === resizeHandle) return;
+            if (e.target.classList.contains('resize-handle')) return;
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -366,17 +599,26 @@
             qrContainer.style.right = 'auto';
         }
 
-        // Resize Logic
-        resizeHandle.addEventListener('mousedown', function(e) {
-            e.stopPropagation();
-            isResizing = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            startWidth = qrContainer.offsetWidth;
-            startHeight = qrContainer.offsetHeight;
+        // 4 Corner Resize Logic
+        document.querySelectorAll('.resize-handle').forEach(handle => {
+            handle.addEventListener('mousedown', function(e) {
+                e.stopPropagation();
+                isResizing = true;
+                currentHandle = e.target.getAttribute('data-handle');
+                startX = e.clientX;
+                startY = e.clientY;
 
-            document.addEventListener('mousemove', onMouseMoveResize);
-            document.addEventListener('mouseup', onMouseUp);
+                const rect = qrContainer.getBoundingClientRect();
+                const parentRect = cardParent.getBoundingClientRect();
+
+                startWidth = rect.width;
+                startHeight = rect.height;
+                startLeft = rect.left - parentRect.left;
+                startTop = rect.top - parentRect.top;
+
+                document.addEventListener('mousemove', onMouseMoveResize);
+                document.addEventListener('mouseup', onMouseUp);
+            });
         });
 
         function onMouseMoveResize(e) {
@@ -384,15 +626,35 @@
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
 
-            let newSize = Math.max(50, Math.max(startWidth + dx, startHeight + dy));
+            let delta = 0;
+            if (currentHandle === 'br') delta = Math.max(dx, dy);
+            else if (currentHandle === 'bl') delta = Math.max(-dx, dy);
+            else if (currentHandle === 'tr') delta = Math.max(dx, -dy);
+            else if (currentHandle === 'tl') delta = Math.max(-dx, -dy);
+
+            let newSize = Math.max(50, startWidth + delta);
+
+            let newLeft = startLeft;
+            let newTop = startTop;
+
+            if (currentHandle === 'tl' || currentHandle === 'bl') {
+                newLeft = startLeft - (newSize - startWidth);
+            }
+            if (currentHandle === 'tl' || currentHandle === 'tr') {
+                newTop = startTop - (newSize - startHeight);
+            }
 
             qrContainer.style.width = newSize + 'px';
             qrContainer.style.height = newSize + 'px';
+            qrContainer.style.left = newLeft + 'px';
+            qrContainer.style.top = newTop + 'px';
+            qrContainer.style.right = 'auto';
         }
 
         function onMouseUp() {
             isDragging = false;
             isResizing = false;
+            currentHandle = null;
             document.removeEventListener('mousemove', onMouseMoveDrag);
             document.removeEventListener('mousemove', onMouseMoveResize);
             document.removeEventListener('mouseup', onMouseUp);
